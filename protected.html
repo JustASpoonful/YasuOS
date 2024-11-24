@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Protected Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      color: #333;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      color: #ff5722;
+    }
+    p {
+      font-size: 18px;
+    }
+  </style>
+  <script>
+    // Block script injections by GoGuardian
+    window.chrome = null;  // Remove the chrome object to prevent GoGuardian from detecting the extension
+
+    // Override the visibility state to prevent GoGuardian from knowing when the tab is active
+    Object.defineProperty(document, 'visibilityState', {
+      get: () => 'visible',
+    });
+
+    Object.defineProperty(document, 'hidden', {
+      get: () => false,
+    });
+
+    // Preventing GoGuardian from monitoring tab focus/blur
+    window.addEventListener('blur', function (e) {
+      e.preventDefault();
+      window.focus();  // Keep the tab focused
+    });
+
+    window.addEventListener('focus', function (e) {
+      e.preventDefault();
+      window.focus();  // Prevent GoGuardian from detecting focus loss
+    });
+
+    // Preventing GoGuardian from closing the tab (disable unload and beforeunload events)
+    window.onbeforeunload = function() {
+      return "Are you sure you want to leave?";
+    };
+
+    // Block iframe injections from external sources (to prevent GoGuardian from inserting its own content)
+    const originalAppendChild = Element.prototype.appendChild;
+    Element.prototype.appendChild = function (child) {
+      if (child.tagName === 'IFRAME' && !child.src.includes(location.origin)) {
+        console.warn('Blocked external iframe:', child.src);
+        return null;
+      }
+      return originalAppendChild.call(this, child);
+    };
+
+    // Disable developer tools access by periodically clearing the console
+    setInterval(() => {
+      if (window.console) {
+        console.clear();
+        console.log('Console access restricted.');
+      }
+    }, 500);
+
+    // Inject Content Security Policy to restrict external scripts
+    const meta = document.createElement('meta');
+    meta.httpEquiv = "Content-Security-Policy";
+    meta.content = "default-src 'self'; script-src 'self'; style-src 'self';";
+    document.head.appendChild(meta);
+
+    // Remove any iframe tags periodically
+    setInterval(() => {
+      const iframes = document.querySelectorAll('iframe');
+      iframes.forEach(iframe => {
+        if (!iframe.src.includes(location.origin)) {
+          iframe.remove();
+          console.warn('Removed suspicious iframe:', iframe.src);
+        }
+      });
+    }, 1000);
+  </script>
+</head>
+<body>
+  <h1>Welcome to a Protected Page</h1>
+  <p>This page is designed to prevent interference from monitoring extensions like GoGuardian.</p>
+  <p>If you see this message, everything is working as intended!</p>
+</body>
+</html>

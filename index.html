@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title></title>Maxwell</title>
+  <link rel="shortcut icon" type="image/png" href="https://raw.githubusercontent.com/Blobby-Boi/ExtHang3r/main/favicon.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap">
+  <style>
+    body {
+      font-family: 'Varela Round', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    header {
+      background-color: #343a40;
+      color: #fff;
+      padding: 10px 20px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .logo {
+      width: 50px;
+      height: 50px;
+      margin-right: 10px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 150px auto 0 auto;
+      padding: 20px;
+      text-align: center;
+      background: #fff;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+    button {
+      font-family: 'Varela Round', sans-serif;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 5px;
+      margin-top: 10px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    footer {
+      background-color: #343a40;
+      color: #fff;
+      text-align: center;
+      padding: 10px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+    footer a {
+      color: #007bff;
+      text-decoration: none;
+    }
+    footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <img src="https://blobby-boi.github.io/BlobbypassXSS/favicon.png" alt="Logo" class="logo">
+  <h1>ExtHang3r</h1>
+</header>
+
+<div class="container">
+  <p>This website is under construction!</p>
+  <div id="redirectButtonContainer"></div>
+</div>
+
+<footer>
+  <p>Made by <a href="https://github.com/Blobby-Boi/">Blobby Boi</a></p>
+</footer>
+
+<script>
+  async function checkExtensionURL(url) {
+    try {
+      const response = await fetch(url);
+      return response.ok;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async function populateRedirectButton() {
+    const redirectContainer = document.getElementById("redirectButtonContainer");
+    const extensions = {
+      "Securly": "chrome-extension://joflmkccibkooplaeoinecjbmdebglab/fonts/Metropolis.css",
+      "Securly (old)": "chrome-extension://iheobagjkfklnlikgihanlhcddjoihkg/fonts/Metropolis.css",
+      "GoGuardian": "chrome-extension://haldlgldplgnggkjaafhelgiaglafanh/youtube_injection.js",
+      "LANSchool": "chrome-extension://baleiojnjpgeojohhhfbichcodgljmnj/blocked.html",
+      "Linewize": "chrome-extension://ddfbkhpmcdbciejenfcolaaiebnjcbfc/background/assets/pages/default-blocked.html",
+      "Blocksi": "chrome-extension://ghlpmldmjjhmdgmneoaibbegkjjbonbk/pages/blockPage.html",
+      "FortiGuard": "chrome-extension://igbgpehnbmhgdgjbhkkpedommgmfbeao/youtube_injection.js",
+      "Cisco Umbrella": "chrome-extension://jcdhmojfecjfmbdpchihbeilohgnbdci/blocked.html",
+      "ContentKeeper": "chrome-extension://jdogphakondfdmcanpapfahkdomaicfa/img/ckauth19x.png"
+      // Add more extensions as needed.
+    };
+
+    for (const [name, url] of Object.entries(extensions)) {
+      if (await checkExtensionURL(url)) {
+        const button = document.createElement("button");
+        button.textContent = `Continue to ${name}`;
+        button.onclick = () => window.location.href = url;
+        redirectContainer.appendChild(button);
+        return;
+      }
+    }
+
+    redirectContainer.innerHTML = "<p>No supported extensions are currently installed.</p>";
+  }
+
+  populateRedirectButton();
+</script>
+
+</body>
+</html>

@@ -87,6 +87,8 @@
 </footer>
 
 <script>
+  const redirect = 'protected.html';
+  
   async function checkExtensionURL(url) {
     try {
       const response = await fetch(url);
@@ -115,7 +117,7 @@
       if (await checkExtensionURL(url)) {
         const button = document.createElement("button");
         button.textContent = `Continue to ${name}`;
-        button.onclick = () => window.location.href = url;
+        button.onclick = () => window.location.href = 'redirect';
         redirectContainer.appendChild(button);
         return;
       }

@@ -117,7 +117,7 @@
       if (await checkExtensionURL(url)) {
         const button = document.createElement("button");
         button.textContent = `Continue to ${name}`;
-        button.onclick = () => window.location.href = 'redirect';
+        button.onclick = () => window.location.href = 'protected';
         redirectContainer.appendChild(button);
         return;
       }

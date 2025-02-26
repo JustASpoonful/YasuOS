@@ -1,238 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Windows 7</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: url('https://w0.peakpx.com/wallpaper/313/1021/HD-wallpaper-windows-7-blue-background.jpg') no-repeat center center fixed;
-            background-size: cover;
-            font-family: Segoe UI, sans-serif;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Windows 7</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('https://w0.peakpx.com/wallpaper/313/1021/HD-wallpaper-windows-7-blue-background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
 
-        /* Taskbar */
-        .taskbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 40px;
-            background: rgba(20, 20, 20, 0.8);
-            display: flex;
-            align-items: center;
-            padding: 0 10px;
-            box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.5);
-        }
+    /* Taskbar */
+    .taskbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: rgba(20, 20, 20, 0.8);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.5);
+    }
 
-        .taskbar img {
-            width: 30px;
-            height: 30px;
-            cursor: pointer;
-        }
+    .taskbar img {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
 
-        /* Desktop Icons */
-        .desktop {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
+    /* Desktop Icons */
+    .desktop {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-        .icon {
-            text-align: center;
-            cursor: pointer;
-            color: white;
-            width: 80px;
-        }
+    .icon {
+      text-align: center;
+      cursor: pointer;
+      color: white;
+      width: 80px;
+    }
 
-        .icon img {
-            width: 50px;
-            height: 50px;
-        }
+    .icon img {
+      width: 50px;
+      height: 50px;
+    }
 
-        /* Windows */
-        .window {
-            position: absolute;
-            width: 600px;
-            height: 400px;
-            background: white;
-            border: 2px solid #ccc;
-            box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-            display: none;
-            top: 100px;
-            left: 100px;
-        }
+    /* Windows */
+    .window {
+      position: absolute;
+      width: 600px;
+      height: 400px;
+      background: white;
+      border: 2px solid #ccc;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+      display: none;
+      top: 100px;
+      left: 100px;
+    }
 
-        .window .title-bar {
-            background: #0078D7;
-            color: white;
-            padding: 5px;
-            cursor: move;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .window .title-bar {
+      background: #0078D7;
+      color: white;
+      padding: 5px;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-        .window .title-bar button {
-            background: red;
-            color: white;
-            border: none;
-            cursor: pointer;
-            width: 20px;
-            height: 20px;
-        }
+    .window .title-bar button {
+      background: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      font-weight: bold;
+      line-height: 18px;
+      text-align: center;
+      padding: 0;
+    }
 
-        .window .content {
-            padding: 10px;
-            height: calc(100% - 30px);
-            overflow: auto;
-        }
+    .window .content {
+      padding: 10px;
+      height: calc(100% - 30px);
+      overflow: auto;
+    }
 
-        .resize-handle {
-            width: 10px;
-            height: 10px;
-            background: gray;
-            position: absolute;
-            bottom: 0;
-            right: 0;
-            cursor: nwse-resize;
-        }
-
-        /* Chrome Browser */
-        #chrome-frame {
-            width: 100%;
-            height: 90%;
-            border: none;
-        }
-    </style>
+    .resize-handle {
+      width: 10px;
+      height: 10px;
+      background: gray;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      cursor: nwse-resize;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Desktop Icons -->
-    <div class="desktop">
-        <div class="icon" onclick="openApp('chrome')">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.svg">
-            <div>Chrome</div>
-        </div>
-        <div class="icon" onclick="openApp('settings')">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Windows_Settings_app_icon.png">
-            <div>Settings</div>
-        </div>
-    </div>
+  <!-- Desktop Icons Container -->
+  <div class="desktop">
+    <!-- Icons will be generated dynamically -->
+  </div>
 
-    <!-- Taskbar -->
-    <div class="taskbar">
-        <img src="https://www.freeiconspng.com/thumbs/windows-7-icon/windows-7-icon-14.png" onclick="alert('Start Menu not implemented yet!')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.svg" onclick="openApp('chrome')">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Windows_Settings_app_icon.png" onclick="openApp('settings')">
-    </div>
+  <!-- Taskbar -->
+  <div class="taskbar">
+    <img src="https://www.freeiconspng.com/thumbs/windows-7-icon/windows-7-icon-14.png" alt="Start Menu" onclick="alert('Start Menu not implemented yet!')" />
+    <!-- Taskbar icons will be generated dynamically -->
+  </div>
 
-    <!-- Chrome App -->
-    <div class="window" id="chrome">
-        <div class="title-bar">
-            Google Chrome
-            <button onclick="closeApp('chrome')">X</button>
-        </div>
-        <div class="content">
-            <input type="text" id="chrome-url" placeholder="Enter URL..." value="https://www.bing.com" onkeydown="if(event.key==='Enter') loadChromePage()">
-            <iframe id="chrome-frame" src="https://www.bing.com"></iframe>
-        </div>
-        <div class="resize-handle"></div>
-    </div>
+  <script>
+    // Define your apps list.
+    // For Settings, we want inline content (background changer), so its content property can be ignored.
+    const appList = [
+      {
+        name: "Chrome",
+        icon: "https://upload.wikimedia.org/wikipedia/commons/8/87/Google_Chrome_icon_%282011%29.svg",
+        content: "chrome.html"
+      },
+      {
+        name: "Settings",
+        icon: "https://upload.wikimedia.org/wikipedia/commons/6/6f/Windows_Settings_app_icon.png",
+        content: "" // We'll load inline content for Settings.
+      }
+      // Add more apps as needed.
+    ];
 
-    <!-- Settings App -->
-    <div class="window" id="settings">
-        <div class="title-bar">
-            Settings
-            <button onclick="closeApp('settings')">X</button>
-        </div>
-        <div class="content">
-            <h3>Change Background</h3>
-            <input type="text" id="bg-url" placeholder="Enter image URL (PNG, GIF)">
-            <button onclick="changeBackground()">Apply</button>
-        </div>
-        <div class="resize-handle"></div>
-    </div>
+    // Render desktop icons dynamically.
+    function renderDesktopIcons() {
+      const desktop = document.querySelector('.desktop');
+      desktop.innerHTML = '';
+      appList.forEach(app => {
+        const iconDiv = document.createElement('div');
+        iconDiv.classList.add('icon');
+        iconDiv.onclick = () => openApp(app.name.toLowerCase());
 
-    <script>
-        let apps = ['chrome', 'settings'];
+        const img = document.createElement('img');
+        img.src = app.icon;
+        img.alt = app.name;
 
-        function openApp(app) {
-            document.getElementById(app).style.display = 'block';
+        const label = document.createElement('div');
+        label.textContent = app.name;
+
+        iconDiv.appendChild(img);
+        iconDiv.appendChild(label);
+        desktop.appendChild(iconDiv);
+      });
+    }
+
+    // Render taskbar icons dynamically.
+    function renderTaskbarIcons() {
+      const taskbar = document.querySelector('.taskbar');
+      // Preserve the Start Menu icon; remove any others.
+      while (taskbar.children.length > 1) {
+        taskbar.removeChild(taskbar.lastChild);
+      }
+      appList.forEach(app => {
+        const img = document.createElement('img');
+        img.src = app.icon;
+        img.alt = app.name;
+        img.title = app.name;
+        img.onclick = () => openApp(app.name.toLowerCase());
+        taskbar.appendChild(img);
+      });
+    }
+
+    // Open an app window. If it exists, show it; otherwise, create it.
+    function openApp(appId) {
+      const app = appList.find(a => a.name.toLowerCase() === appId);
+      if (!app) {
+        console.error("App not found: " + appId);
+        return;
+      }
+      let appWindow = document.getElementById(appId);
+      if (!appWindow) {
+        appWindow = createAppWindow(app);
+      } else {
+        appWindow.style.display = 'block';
+      }
+    }
+
+    // Create a Windows 7–styled app window.
+    // For Settings, load inline HTML; for others, load an external file via an iframe.
+    function createAppWindow(app) {
+      const windowDiv = document.createElement('div');
+      windowDiv.classList.add('window');
+      windowDiv.id = app.name.toLowerCase();
+      windowDiv.style.display = 'block';
+
+      // Create the title bar.
+      const titleBar = document.createElement('div');
+      titleBar.classList.add('title-bar');
+      titleBar.textContent = app.name;
+      const closeButton = document.createElement('button');
+      closeButton.textContent = 'X';
+      closeButton.onclick = () => { windowDiv.style.display = 'none'; };
+      titleBar.appendChild(closeButton);
+
+      // Create the content area.
+      const contentDiv = document.createElement('div');
+      contentDiv.classList.add('content');
+      if(app.name.toLowerCase() === 'settings') {
+        // Inline content for Settings: background changer.
+        contentDiv.innerHTML = `
+          <h3>Change Background</h3>
+          <input type="text" id="bg-url" placeholder="Enter image URL (PNG, GIF)">
+          <button onclick="changeBackground()">Apply</button>
+        `;
+      } else {
+        // For other apps, load the external HTML file via an iframe.
+        const iframe = document.createElement('iframe');
+        iframe.src = app.content;
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        contentDiv.appendChild(iframe);
+      }
+
+      // Create the resize handle.
+      const resizeHandle = document.createElement('div');
+      resizeHandle.classList.add('resize-handle');
+
+      // Assemble the window.
+      windowDiv.appendChild(titleBar);
+      windowDiv.appendChild(contentDiv);
+      windowDiv.appendChild(resizeHandle);
+      document.body.appendChild(windowDiv);
+
+      // Enable dragging and resizing.
+      makeDraggableAndResizable(windowDiv);
+
+      return windowDiv;
+    }
+
+    // Make the window draggable and resizable.
+    function makeDraggableAndResizable(win) {
+      let bar = win.querySelector('.title-bar');
+      let resizeHandle = win.querySelector('.resize-handle');
+      let isDragging = false, isResizing = false;
+      let startX, startY, startWidth, startHeight, offsetX, offsetY;
+
+      bar.addEventListener('mousedown', e => {
+        isDragging = true;
+        offsetX = e.clientX - win.offsetLeft;
+        offsetY = e.clientY - win.offsetTop;
+      });
+
+      resizeHandle.addEventListener('mousedown', e => {
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = win.offsetWidth;
+        startHeight = win.offsetHeight;
+        e.stopPropagation();
+      });
+
+      document.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+          win.style.left = (e.clientX - offsetX) + 'px';
+          win.style.top = (e.clientY - offsetY) + 'px';
         }
-
-        function closeApp(app) {
-            document.getElementById(app).style.display = 'none';
+        if (isResizing) {
+          win.style.width = startWidth + (e.clientX - startX) + 'px';
+          win.style.height = startHeight + (e.clientY - startY) + 'px';
         }
+      });
 
-        function changeBackground() {
-            let url = document.getElementById('bg-url').value;
-            if (url) {
-                localStorage.setItem('wallpaper', url);
-                document.body.style.backgroundImage = `url('${url}')`;
-            }
-        }
+      document.addEventListener('mouseup', function() {
+        isDragging = false;
+        isResizing = false;
+      });
+    }
 
-        function loadChromePage() {
-            let url = document.getElementById('chrome-url').value;
-            if (!url.startsWith('http')) {
-                url = 'https://' + url;
-            }
-            document.getElementById('chrome-frame').src = 'https://www.google.com/search?q=' + encodeURIComponent(url);
-        }
+    // Function to change the background and save it via localStorage.
+    function changeBackground() {
+      const bgInput = document.getElementById('bg-url');
+      if (bgInput && bgInput.value) {
+        localStorage.setItem('wallpaper', bgInput.value);
+        document.body.style.backgroundImage = `url('${bgInput.value}')`;
+      }
+    }
 
-        // Restore Background from Local Storage
-        window.onload = function() {
-            let savedBg = localStorage.getItem('wallpaper');
-            if (savedBg) {
-                document.body.style.backgroundImage = `url('${savedBg}')`;
-            }
-
-            // Make Windows Draggable & Resizable
-            document.querySelectorAll('.window').forEach(win => {
-                let bar = win.querySelector('.title-bar');
-                let resizeHandle = win.querySelector('.resize-handle');
-                let isResizing = false, isDragging = false;
-                let startX, startY, startWidth, startHeight, offsetX, offsetY;
-
-                bar.addEventListener('mousedown', e => {
-                    isDragging = true;
-                    offsetX = e.clientX - win.offsetLeft;
-                    offsetY = e.clientY - win.offsetTop;
-                });
-
-                resizeHandle.addEventListener('mousedown', e => {
-                    isResizing = true;
-                    startX = e.clientX;
-                    startY = e.clientY;
-                    startWidth = win.offsetWidth;
-                    startHeight = win.offsetHeight;
-                });
-
-                document.addEventListener('mousemove', e => {
-                    if (isDragging) {
-                        win.style.left = e.clientX - offsetX + 'px';
-                        win.style.top = e.clientY - offsetY + 'px';
-                    }
-                    if (isResizing) {
-                        win.style.width = startWidth + (e.clientX - startX) + 'px';
-                        win.style.height = startHeight + (e.clientY - startY) + 'px';
-                    }
-                });
-
-                document.addEventListener('mouseup', () => { isDragging = false; isResizing = false; });
-            });
-        };
-    </script>
-
+    // On page load, render desktop and taskbar icons and restore saved background.
+    window.onload = function() {
+      renderDesktopIcons();
+      renderTaskbarIcons();
+      const savedBg = localStorage.getItem('wallpaper');
+      if (savedBg) {
+        document.body.style.backgroundImage = `url('${savedBg}')`;
+      }
+    };
+  </script>
 </body>
 </html>
+
 
 
 

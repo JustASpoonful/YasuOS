@@ -114,20 +114,15 @@
 </head>
 <body>
 
-  <!-- Desktop Icons Container -->
   <div class="desktop">
-    <!-- Icons will be generated dynamically -->
   </div>
 
-  <!-- Taskbar -->
   <div class="taskbar">
     <img src="https://www.freeiconspng.com/thumbs/windows-7-icon/windows-7-icon-14.png" alt="Start Menu" onclick="alert('Start Menu not implemented yet!')" />
-    <!-- Taskbar icons will be generated dynamically -->
   </div>
 
   <script>
-    // Define your apps list.
-    // For Settings, we want inline content (background changer), so its content property can be ignored.
+    // For Settings, I want inline content (background changer), so its content property can be ignored.
     const appList = [
       {
         name: "Chrome",
@@ -144,10 +139,10 @@
         icon: "https://img.icons8.com/?size=512&id=u9JE2GppVZoD&format=png",
         content: "app/chatgpt.html"
       }
-      // Add more apps as needed.
+     
     ];
 
-    // Render desktop icons dynamically.
+
     function renderDesktopIcons() {
       const desktop = document.querySelector('.desktop');
       desktop.innerHTML = '';
@@ -169,10 +164,9 @@
       });
     }
 
-    // Render taskbar icons dynamically.
+  
     function renderTaskbarIcons() {
       const taskbar = document.querySelector('.taskbar');
-      // Preserve the Start Menu icon; remove any others.
       while (taskbar.children.length > 1) {
         taskbar.removeChild(taskbar.lastChild);
       }
@@ -201,15 +195,14 @@
       }
     }
 
-    // Create a Windows 7–styled app window.
-    // For Settings, load inline HTML; for others, load an external file via an iframe.
+    // Create a Windows 7– based and/or styled app window.
     function createAppWindow(app) {
       const windowDiv = document.createElement('div');
       windowDiv.classList.add('window');
       windowDiv.id = app.name.toLowerCase();
       windowDiv.style.display = 'block';
 
-      // Create the title bar.
+      // Create's the title bar.
       const titleBar = document.createElement('div');
       titleBar.classList.add('title-bar');
       titleBar.textContent = app.name;
@@ -218,14 +211,14 @@
       closeButton.onclick = () => { windowDiv.style.display = 'none'; };
       titleBar.appendChild(closeButton);
 
-      // Create the content area.
+      // Create's the content area.
       const contentDiv = document.createElement('div');
       contentDiv.classList.add('content');
       if(app.name.toLowerCase() === 'settings') {
-        // Inline content for Settings: background changer.
+        
         contentDiv.innerHTML = `
           <h3>Change Background</h3>
-          <input type="text" id="bg-url" placeholder="Enter image URL (PNG, GIF)">
+          <input type="text" id="bg-url" placeholder="Enter image URL (PNG, GIF. Find a image you want, right click and copy image address then paste it in this text box.)">
           <button onclick="changeBackground()">Apply</button>
         `;
       } else {

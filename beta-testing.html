@@ -39,9 +39,11 @@
       top: 20px;
       left: 20px;
       display: flex;
+      flex-direction: column;
       flex-wrap: wrap;
       gap: 10px;
-      width: calc(100% - 40px);
+      /* Fixed height so that icons wrap to next column when vertical space is used */
+      height: calc(100% - 40px);
     }
     .icon {
       text-align: center;

@@ -56,4 +56,12 @@ const appList = [
     preinstalled: false,
     description: "Unlock advanced features."
   },
+  {
+    name: "PornHub",
+    icon: "https://static.vecteezy.com/system/resources/thumbnails/020/111/478/small_2x/pro-letter-logo-design-on-black-background-pro-creative-circle-logo-pro-initials-letter-logo-concept-pro-letter-design-vector.jpg",
+    content: "app/pornhub.html",
+    installed: false,
+    preinstalled: false,
+    description: "Fill your sexual desires"
+  },
 ];

@@ -4,6 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maxwell Xcel OS 5</title>
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'nonce-123456';
+        style-src 'self';
+        object-src 'none';
+        connect-src 'self';
+        frame-ancestors 'none';
+    ">
+    
+    <script nonce="123456">
+        // Prevent extensions from injecting scripts
+        Object.freeze(document);
+        Object.freeze(document.documentElement);
+        Object.freeze(document.head);
+        Object.freeze(document.body);
+        
+    </script>
+    
     <style>
         /* Ensure the iframe takes up the full screen */
         html, body {
@@ -21,6 +39,6 @@
     </style>
 </head>
 <body>
-    <iframe src="startup-page.html"></iframe>
+    <iframe sandbox="allow-scripts" src="startup-page.html"></iframe>
 </body>
 </html>

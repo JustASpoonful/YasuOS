@@ -25,14 +25,6 @@ const appList = [
     description: "AI-powered conversation assistant."
   },
   {
-    name: "Control Panel",
-    icon: "https://cdn-icons-png.flaticon.com/512/1833/1833481.png",
-    content: "app/controlpanel.html",
-    installed: true,
-    preinstalled: true,
-    description: "Manage system configurations."
-  },
-  {
     name: "Notepad",
     icon: "https://upload.wikimedia.org/wikipedia/commons/f/f5/Notepad_plus_plus.png",
     content: "app/notepad.html",

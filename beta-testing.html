@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Maxwell OS 5</title>
   <link rel="icon" type="image/x-icon" href="Win7Xcel.png">
-  
   <style>
     body {
       margin: 0;
@@ -15,7 +14,6 @@
       font-family: "Segoe UI", sans-serif;
       overflow: hidden;
     }
-
     /* Taskbar */
     .taskbar {
       position: fixed;
@@ -29,14 +27,12 @@
       padding: 0 10px;
       box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.5);
     }
-
     .taskbar img {
       width: 30px;
       height: 30px;
       cursor: pointer;
       margin-right: 10px;
     }
-
     /* Desktop Icons */
     .desktop {
       position: absolute;
@@ -46,19 +42,16 @@
       flex-direction: column;
       gap: 10px;
     }
-
     .icon {
       text-align: center;
       cursor: pointer;
       color: white;
       width: 80px;
     }
-
     .icon img {
       width: 50px;
       height: 50px;
     }
-
     /* Windows */
     .window {
       position: absolute;
@@ -71,7 +64,6 @@
       top: 100px;
       left: 100px;
     }
-
     .window .title-bar {
       background: #0078D7;
       color: white;
@@ -81,7 +73,6 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .window .title-bar button {
       background: red;
       color: white;
@@ -95,13 +86,11 @@
       padding: 0;
       margin-left: 5px;
     }
-
     .window .content {
       padding: 10px;
       height: calc(100% - 30px);
       overflow: auto;
     }
-
     .resize-handle {
       width: 10px;
       height: 10px;
@@ -111,7 +100,6 @@
       right: 0;
       cursor: nwse-resize;
     }
-    
     /* Custom Context Menu */
     #custom-context-menu {
       position: absolute;
@@ -122,12 +110,10 @@
       padding: 5px;
       box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
     }
-    
     #custom-context-menu div {
       cursor: pointer;
       padding: 3px 10px;
     }
-    
     #custom-context-menu div:hover {
       background: #eee;
     }
@@ -146,55 +132,10 @@
     <div id="delete-option">Delete</div>
   </div>
 
-  <script>
-    // App list with new "installed" and "preinstalled" properties.
-    const appList = [
-      {
-        name: "Chrome",
-        icon: "https://pngimg.com/d/chrome_logo_PNG33.png",
-        content: "app/chrome.html",
-        installed: true,
-        preinstalled: true
-      },
-      {
-        name: "Settings",
-        icon: "https://cdn0.iconfinder.com/data/icons/apple-apps/100/Apple_Settings-512.png",
-        content: "", // inline content for Settings.
-        installed: true,
-        preinstalled: true
-      },
-      {
-        name: "ChatGPT",
-        icon: "https://img.icons8.com/?size=512&id=u9JE2GppVZoD&format=png",
-        content: "app/chatgpt.html",
-        installed: true,
-        preinstalled: true
-      },
-      {
-        name: "Control Panel",
-        icon: "https://cdn-icons-png.flaticon.com/512/1833/1833481.png",
-        content: "app/controlpanel.html",
-        installed: true,
-        preinstalled: true
-      },
-      // A sample app that is not preinstalled.
-      {
-        name: "Notepad",
-        icon: "https://upload.wikimedia.org/wikipedia/commons/f/f5/Notepad_plus_plus.png",
-        content: "app/notepad.html",
-        installed: false,
-        preinstalled: false
-      },
-      // App Store (always installed)
-      {
-        name: "App Store",
-        icon: "https://apps.microsoft.com/assets/icons/logo-256x256.png",
-        content: "", // inline content for App Store.
-        installed: true,
-        preinstalled: true
-      }
-    ];
+  <!-- Include external file that defines appList -->
+  <script src="apps.js"></script>
 
+  <script>
     // Load installed states from localStorage.
     function loadInstalledApps() {
       const saved = localStorage.getItem('installedApps');
@@ -224,7 +165,7 @@
       appList.filter(app => app.installed).forEach(app => {
         const iconDiv = document.createElement('div');
         iconDiv.classList.add('icon');
-        // Double click to open.
+        // Double-click to open.
         iconDiv.ondblclick = () => openApp(app.name.toLowerCase());
         // Right-click for context menu (if app not preinstalled).
         iconDiv.addEventListener('contextmenu', function(e) {
@@ -233,14 +174,11 @@
             showContextMenu(e.pageX, e.pageY, app);
           }
         });
-
         const img = document.createElement('img');
         img.src = app.icon;
         img.alt = app.name;
-
         const label = document.createElement('div');
         label.textContent = app.name;
-
         iconDiv.appendChild(img);
         iconDiv.appendChild(label);
         desktop.appendChild(iconDiv);
@@ -259,7 +197,7 @@
         img.src = app.icon;
         img.alt = app.name;
         img.title = app.name;
-        // Double click to open.
+        // Double-click to open.
         img.ondblclick = () => openApp(app.name.toLowerCase());
         // Right-click for context menu (if app not preinstalled).
         img.addEventListener('contextmenu', function(e) {
@@ -297,41 +235,32 @@
       windowDiv.classList.add('window');
       windowDiv.id = app.name.toLowerCase();
       windowDiv.style.display = 'block';
-
       // Create the title bar.
       const titleBar = document.createElement('div');
       titleBar.classList.add('title-bar');
       titleBar.textContent = app.name;
-      
       // Create the close button.
       const closeButton = document.createElement('button');
       closeButton.textContent = 'X';
       closeButton.onclick = () => { windowDiv.style.display = 'none'; };
       titleBar.appendChild(closeButton);
-
       // (No uninstall button here – uninstall is now via right-click on icon.)
-
       // Create the content area.
       const contentDiv = document.createElement('div');
       contentDiv.classList.add('content');
-      
       if (app.name.toLowerCase() === 'settings') {
-        // Inline content for Settings.
         contentDiv.innerHTML = `
           <h3>Change Background</h3>
           <input type="text" id="bg-url" placeholder="Enter image URL (PNG, GIF, etc.)">
           <button onclick="changeBackground()">Apply</button>
         `;
       } else if (app.name.toLowerCase() === 'app store') {
-        // Inline content for App Store.
         contentDiv.innerHTML = `
           <h3>App Store</h3>
           <div id="app-store-list"></div>
         `;
-        // Render the list after the window is created.
         setTimeout(renderAppStoreList, 0);
       } else {
-        // For other apps, load the external HTML file via an iframe.
         const iframe = document.createElement('iframe');
         iframe.src = app.content;
         iframe.style.width = "100%";
@@ -339,20 +268,13 @@
         iframe.style.border = "none";
         contentDiv.appendChild(iframe);
       }
-
-      // Create the resize handle.
       const resizeHandle = document.createElement('div');
       resizeHandle.classList.add('resize-handle');
-
-      // Assemble the window.
       windowDiv.appendChild(titleBar);
       windowDiv.appendChild(contentDiv);
       windowDiv.appendChild(resizeHandle);
       document.body.appendChild(windowDiv);
-
-      // Enable dragging and resizing.
       makeDraggableAndResizable(windowDiv);
-
       return windowDiv;
     }
 
@@ -362,13 +284,11 @@
       let resizeHandle = win.querySelector('.resize-handle');
       let isDragging = false, isResizing = false;
       let startX, startY, startWidth, startHeight, offsetX, offsetY;
-
       bar.addEventListener('mousedown', e => {
         isDragging = true;
         offsetX = e.clientX - win.offsetLeft;
         offsetY = e.clientY - win.offsetTop;
       });
-
       resizeHandle.addEventListener('mousedown', e => {
         isResizing = true;
         startX = e.clientX;
@@ -377,7 +297,6 @@
         startHeight = win.offsetHeight;
         e.stopPropagation();
       });
-
       document.addEventListener('mousemove', function(e) {
         if (isDragging) {
           win.style.left = (e.clientX - offsetX) + 'px';
@@ -388,7 +307,6 @@
           win.style.height = startHeight + (e.clientY - startY) + 'px';
         }
       });
-
       document.addEventListener('mouseup', function() {
         isDragging = false;
         isResizing = false;
@@ -404,7 +322,7 @@
       }
     }
 
-    // Render the App Store list (only apps that are not installed and not the App Store itself).
+    // Render the App Store list.
     function renderAppStoreList() {
       const storeList = document.getElementById('app-store-list');
       if (!storeList) return;
@@ -452,14 +370,11 @@
       menu.style.top = y + 'px';
       menu.style.display = 'block';
     }
-
     function hideContextMenu() {
       const menu = document.getElementById('custom-context-menu');
       menu.style.display = 'none';
       currentContextApp = null;
     }
-
-    // When clicking the "Delete" option.
     document.getElementById('delete-option').addEventListener('click', function(e) {
       if (currentContextApp && !currentContextApp.preinstalled) {
         currentContextApp.installed = false;
@@ -470,13 +385,9 @@
       }
       hideContextMenu();
     });
-
-    // Prevent clicks on the context menu from closing it.
     document.getElementById('custom-context-menu').addEventListener('click', function(e) {
       e.stopPropagation();
     });
-
-    // Hide the context menu on any click outside.
     document.addEventListener('click', function(e) {
       hideContextMenu();
     });

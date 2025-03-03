@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maxwell OS 5 - Beta</title>
+  <link rel="icon" type="image/x-icon" href="Win7Xcel.png">
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: url('https://w0.peakpx.com/wallpaper/313/1021/HD-wallpaper-windows-7-blue-background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: "Segoe UI", sans-serif;
+      overflow: hidden;
+    }
+
+    /* Taskbar */
+    .taskbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: rgba(20, 20, 20, 0.8);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.5);
+    }
+
+    .taskbar img {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+
+    /* Desktop Icons */
+    .desktop {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .icon {
+      text-align: center;
+      cursor: pointer;
+      color: white;
+      width: 80px;
+    }
+
+    .icon img {
+      width: 50px;
+      height: 50px;
+    }
+
+    /* Windows */
+    .window {
+      position: absolute;
+      width: 600px;
+      height: 400px;
+      background: white;
+      border: 2px solid #ccc;
+      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+      display: none;
+      top: 100px;
+      left: 100px;
+    }
+
+    .window .title-bar {
+      background: #0078D7;
+      color: white;
+      padding: 5px;
+      cursor: move;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .window .title-bar button {
+      background: red;
+      color: white;
+      border: none;
+      cursor: pointer;
+      width: 20px;
+      height: 20px;
+      font-weight: bold;
+      line-height: 18px;
+      text-align: center;
+      padding: 0;
+    }
+
+    .window .content {
+      padding: 10px;
+      height: calc(100% - 30px);
+      overflow: auto;
+    }
+
+    .resize-handle {
+      width: 10px;
+      height: 10px;
+      background: gray;
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      cursor: nwse-resize;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="desktop">
+  </div>
+
+  <div class="taskbar">
+    <img src="https://www.freeiconspng.com/thumbs/windows-7-icon/windows-7-icon-14.png" alt="Start Menu" onclick="alert('Start Menu not implemented yet!')" />
+  </div>
+
+  <script>
+    // App list with new "installed" property.
+    const appList = [
+      {
+        name: "Chrome",
+        icon: "https://pngimg.com/d/chrome_logo_PNG33.png",
+        content: "app/chrome.html",
+        installed: true
+      },
+      {
+        name: "Settings",
+        icon: "https://cdn0.iconfinder.com/data/icons/apple-apps/100/Apple_Settings-512.png",
+        content: "", // inline content for Settings.
+        installed: true
+      },
+      {
+        name: "ChatGPT",
+        icon: "https://img.icons8.com/?size=512&id=u9JE2GppVZoD&format=png",
+        content: "app/chatgpt.html",
+        installed: true
+      },
+      {
+        name: "Control Panel",
+        icon: "https://cdn-icons-png.flaticon.com/512/1833/1833481.png",
+        content: "app/controlpanel.html",
+        installed: true
+      },
+      // A sample uninstalled app for demonstration.
+      {
+        name: "Notepad",
+        icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notepad_icon.svg/1024px-Notepad_icon.svg.png",
+        content: "app/notepad.html",
+        installed: false
+      },
+      // App Store itself (always installed so you can use it to install others)
+      {
+        name: "App Store",
+        icon: "https://icon-library.com/images/app-store-icon-png/app-store-icon-png-19.jpg",
+        content: "", // inline content for App Store.
+        installed: true
+      }
+    ];
+
+    // Load installed states from localStorage.
+    function loadInstalledApps() {
+      const saved = localStorage.getItem('installedApps');
+      if (saved) {
+        const installedApps = JSON.parse(saved);
+        appList.forEach(app => {
+          if(installedApps.hasOwnProperty(app.name)) {
+            app.installed = installedApps[app.name];
+          }
+        });
+      }
+    }
+
+    // Save installed states to localStorage.
+    function saveInstalledApps() {
+      const installedApps = {};
+      appList.forEach(app => {
+        installedApps[app.name] = app.installed;
+      });
+      localStorage.setItem('installedApps', JSON.stringify(installedApps));
+    }
+
+    // Render desktop icons only for installed apps.
+    function renderDesktopIcons() {
+      const desktop = document.querySelector('.desktop');
+      desktop.innerHTML = '';
+      appList.filter(app => app.installed).forEach(app => {
+        const iconDiv = document.createElement('div');
+        iconDiv.classList.add('icon');
+        iconDiv.onclick = () => openApp(app.name.toLowerCase());
+
+        const img = document.createElement('img');
+        img.src = app.icon;
+        img.alt = app.name;
+
+        const label = document.createElement('div');
+        label.textContent = app.name;
+
+        iconDiv.appendChild(img);
+        iconDiv.appendChild(label);
+        desktop.appendChild(iconDiv);
+      });
+    }
+
+    // Render taskbar icons only for installed apps.
+    function renderTaskbarIcons() {
+      const taskbar = document.querySelector('.taskbar');
+      // Remove all children except the first (Start Menu)
+      while (taskbar.children.length > 1) {
+        taskbar.removeChild(taskbar.lastChild);
+      }
+      appList.filter(app => app.installed).forEach(app => {
+        const img = document.createElement('img');
+        img.src = app.icon;
+        img.alt = app.name;
+        img.title = app.name;
+        img.onclick = () => openApp(app.name.toLowerCase());
+        taskbar.appendChild(img);
+      });
+    }
+
+    // Open an app window. If it exists, show it; otherwise, create it.
+    function openApp(appId) {
+      const app = appList.find(a => a.name.toLowerCase() === appId);
+      if (!app) {
+        console.error("App not found: " + appId);
+        return;
+      }
+      let appWindow = document.getElementById(appId);
+      if (!appWindow) {
+        appWindow = createAppWindow(app);
+      } else {
+        appWindow.style.display = 'block';
+        // If reopening the App Store, refresh its list.
+        if(app.name.toLowerCase() === 'app store') {
+          renderAppStoreList();
+        }
+      }
+    }
+
+    // Create a Windows 7–styled app window.
+    function createAppWindow(app) {
+      const windowDiv = document.createElement('div');
+      windowDiv.classList.add('window');
+      windowDiv.id = app.name.toLowerCase();
+      windowDiv.style.display = 'block';
+
+      // Create the title bar.
+      const titleBar = document.createElement('div');
+      titleBar.classList.add('title-bar');
+      titleBar.textContent = app.name;
+      const closeButton = document.createElement('button');
+      closeButton.textContent = 'X';
+      closeButton.onclick = () => { windowDiv.style.display = 'none'; };
+      titleBar.appendChild(closeButton);
+
+      // Create the content area.
+      const contentDiv = document.createElement('div');
+      contentDiv.classList.add('content');
+      
+      if(app.name.toLowerCase() === 'settings') {
+        // Inline content for Settings.
+        contentDiv.innerHTML = `
+          <h3>Change Background</h3>
+          <input type="text" id="bg-url" placeholder="Enter image URL (PNG, GIF, etc.)">
+          <button onclick="changeBackground()">Apply</button>
+        `;
+      } else if(app.name.toLowerCase() === 'app store') {
+        // Inline content for App Store.
+        contentDiv.innerHTML = `
+          <h3>App Store</h3>
+          <div id="app-store-list"></div>
+        `;
+        // Render the list after the window is created.
+        setTimeout(renderAppStoreList, 0);
+      } else {
+        // For other apps, load the external HTML file via an iframe.
+        const iframe = document.createElement('iframe');
+        iframe.src = app.content;
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        contentDiv.appendChild(iframe);
+      }
+
+      // Create the resize handle.
+      const resizeHandle = document.createElement('div');
+      resizeHandle.classList.add('resize-handle');
+
+      // Assemble the window.
+      windowDiv.appendChild(titleBar);
+      windowDiv.appendChild(contentDiv);
+      windowDiv.appendChild(resizeHandle);
+      document.body.appendChild(windowDiv);
+
+      // Enable dragging and resizing.
+      makeDraggableAndResizable(windowDiv);
+
+      return windowDiv;
+    }
+
+    // Make the window draggable and resizable.
+    function makeDraggableAndResizable(win) {
+      let bar = win.querySelector('.title-bar');
+      let resizeHandle = win.querySelector('.resize-handle');
+      let isDragging = false, isResizing = false;
+      let startX, startY, startWidth, startHeight, offsetX, offsetY;
+
+      bar.addEventListener('mousedown', e => {
+        isDragging = true;
+        offsetX = e.clientX - win.offsetLeft;
+        offsetY = e.clientY - win.offsetTop;
+      });
+
+      resizeHandle.addEventListener('mousedown', e => {
+        isResizing = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        startWidth = win.offsetWidth;
+        startHeight = win.offsetHeight;
+        e.stopPropagation();
+      });
+
+      document.addEventListener('mousemove', function(e) {
+        if (isDragging) {
+          win.style.left = (e.clientX - offsetX) + 'px';
+          win.style.top = (e.clientY - offsetY) + 'px';
+        }
+        if (isResizing) {
+          win.style.width = startWidth + (e.clientX - startX) + 'px';
+          win.style.height = startHeight + (e.clientY - startY) + 'px';
+        }
+      });
+
+      document.addEventListener('mouseup', function() {
+        isDragging = false;
+        isResizing = false;
+      });
+    }
+
+    // Function to change the background and save it via localStorage.
+    function changeBackground() {
+      const bgInput = document.getElementById('bg-url');
+      if (bgInput && bgInput.value) {
+        localStorage.setItem('wallpaper', bgInput.value);
+        document.body.style.backgroundImage = `url('${bgInput.value}')`;
+      }
+    }
+
+    // Render the App Store list (only apps that are not installed and not the App Store itself).
+    function renderAppStoreList() {
+      const storeList = document.getElementById('app-store-list');
+      if (!storeList) return;
+      storeList.innerHTML = '';
+      const uninstalledApps = appList.filter(app => !app.installed && app.name.toLowerCase() !== 'app store');
+      if (uninstalledApps.length === 0) {
+        storeList.innerHTML = '<p>All apps are installed.</p>';
+        return;
+      }
+      uninstalledApps.forEach(app => {
+        const appDiv = document.createElement('div');
+        appDiv.style.display = 'flex';
+        appDiv.style.alignItems = 'center';
+        appDiv.style.marginBottom = '10px';
+        const img = document.createElement('img');
+        img.src = app.icon;
+        img.style.width = '40px';
+        img.style.height = '40px';
+        img.style.marginRight = '10px';
+        const name = document.createElement('span');
+        name.textContent = app.name;
+        const installButton = document.createElement('button');
+        installButton.textContent = 'Install';
+        installButton.style.marginLeft = 'auto';
+        installButton.onclick = () => {
+          app.installed = true;
+          saveInstalledApps();
+          renderDesktopIcons();
+          renderTaskbarIcons();
+          renderAppStoreList();
+        };
+        appDiv.appendChild(img);
+        appDiv.appendChild(name);
+        appDiv.appendChild(installButton);
+        storeList.appendChild(appDiv);
+      });
+    }
+
+    // On page load, load saved installed states, render icons, and restore saved background.
+    window.onload = function() {
+      loadInstalledApps();
+      renderDesktopIcons();
+      renderTaskbarIcons();
+      const savedBg = localStorage.getItem('wallpaper');
+      if (savedBg) {
+        document.body.style.backgroundImage = `url('${savedBg}')`;
+      }
+    };
+  </script>
+</body>
+</html>

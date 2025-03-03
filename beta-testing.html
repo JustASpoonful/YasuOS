@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maxwell OS 5 - Beta</title>
+  <title>Maxwell OS 5</title>
   <link rel="icon" type="image/x-icon" href="Win7Xcel.png">
   
   <style>
@@ -93,6 +93,7 @@
       line-height: 18px;
       text-align: center;
       padding: 0;
+      margin-left: 5px;
     }
 
     .window .content {
@@ -110,57 +111,87 @@
       right: 0;
       cursor: nwse-resize;
     }
+    
+    /* Custom Context Menu */
+    #custom-context-menu {
+      position: absolute;
+      display: none;
+      z-index: 10000;
+      background: #fff;
+      border: 1px solid #ccc;
+      padding: 5px;
+      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+    }
+    
+    #custom-context-menu div {
+      cursor: pointer;
+      padding: 3px 10px;
+    }
+    
+    #custom-context-menu div:hover {
+      background: #eee;
+    }
   </style>
 </head>
 <body>
 
-  <div class="desktop">
-  </div>
+  <div class="desktop"></div>
 
   <div class="taskbar">
     <img src="https://www.freeiconspng.com/thumbs/windows-7-icon/windows-7-icon-14.png" alt="Start Menu" onclick="alert('Start Menu not implemented yet!')" />
   </div>
+  
+  <!-- Custom Context Menu -->
+  <div id="custom-context-menu">
+    <div id="delete-option">Delete</div>
+  </div>
 
   <script>
-    // App list with new "installed" property.
+    // App list with new "installed" and "preinstalled" properties.
     const appList = [
       {
         name: "Chrome",
         icon: "https://pngimg.com/d/chrome_logo_PNG33.png",
         content: "app/chrome.html",
-        installed: true
+        installed: true,
+        preinstalled: true
       },
       {
         name: "Settings",
         icon: "https://cdn0.iconfinder.com/data/icons/apple-apps/100/Apple_Settings-512.png",
         content: "", // inline content for Settings.
-        installed: true
+        installed: true,
+        preinstalled: true
       },
       {
         name: "ChatGPT",
         icon: "https://img.icons8.com/?size=512&id=u9JE2GppVZoD&format=png",
         content: "app/chatgpt.html",
-        installed: true
+        installed: true,
+        preinstalled: true
       },
       {
         name: "Control Panel",
         icon: "https://cdn-icons-png.flaticon.com/512/1833/1833481.png",
         content: "app/controlpanel.html",
-        installed: true
+        installed: true,
+        preinstalled: true
       },
-      // A sample uninstalled app for demonstration.
+      // A sample app that is not preinstalled.
       {
         name: "Notepad",
-        icon: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Notepad_icon.svg/1024px-Notepad_icon.svg.png",
+        icon: "https://upload.wikimedia.org/wikipedia/commons/f/f5/Notepad_plus_plus.png",
         content: "app/notepad.html",
-        installed: false
+        installed: false,
+        preinstalled: false
       },
-      // App Store itself (always installed so you can use it to install others)
+      // App Store (always installed)
       {
         name: "App Store",
-        icon: "https://icon-library.com/images/app-store-icon-png/app-store-icon-png-19.jpg",
+        icon: "https://apps.microsoft.com/assets/icons/logo-256x256.png",
         content: "", // inline content for App Store.
-        installed: true
+        installed: true,
+        preinstalled: true
       }
     ];
 
@@ -170,7 +201,7 @@
       if (saved) {
         const installedApps = JSON.parse(saved);
         appList.forEach(app => {
-          if(installedApps.hasOwnProperty(app.name)) {
+          if (installedApps.hasOwnProperty(app.name)) {
             app.installed = installedApps[app.name];
           }
         });
@@ -193,7 +224,15 @@
       appList.filter(app => app.installed).forEach(app => {
         const iconDiv = document.createElement('div');
         iconDiv.classList.add('icon');
-        iconDiv.onclick = () => openApp(app.name.toLowerCase());
+        // Double click to open.
+        iconDiv.ondblclick = () => openApp(app.name.toLowerCase());
+        // Right-click for context menu (if app not preinstalled).
+        iconDiv.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          if (!app.preinstalled) {
+            showContextMenu(e.pageX, e.pageY, app);
+          }
+        });
 
         const img = document.createElement('img');
         img.src = app.icon;
@@ -220,7 +259,15 @@
         img.src = app.icon;
         img.alt = app.name;
         img.title = app.name;
-        img.onclick = () => openApp(app.name.toLowerCase());
+        // Double click to open.
+        img.ondblclick = () => openApp(app.name.toLowerCase());
+        // Right-click for context menu (if app not preinstalled).
+        img.addEventListener('contextmenu', function(e) {
+          e.preventDefault();
+          if (!app.preinstalled) {
+            showContextMenu(e.pageX, e.pageY, app);
+          }
+        });
         taskbar.appendChild(img);
       });
     }
@@ -238,7 +285,7 @@
       } else {
         appWindow.style.display = 'block';
         // If reopening the App Store, refresh its list.
-        if(app.name.toLowerCase() === 'app store') {
+        if (app.name.toLowerCase() === 'app store') {
           renderAppStoreList();
         }
       }
@@ -255,23 +302,27 @@
       const titleBar = document.createElement('div');
       titleBar.classList.add('title-bar');
       titleBar.textContent = app.name;
+      
+      // Create the close button.
       const closeButton = document.createElement('button');
       closeButton.textContent = 'X';
       closeButton.onclick = () => { windowDiv.style.display = 'none'; };
       titleBar.appendChild(closeButton);
 
+      // (No uninstall button here – uninstall is now via right-click on icon.)
+
       // Create the content area.
       const contentDiv = document.createElement('div');
       contentDiv.classList.add('content');
       
-      if(app.name.toLowerCase() === 'settings') {
+      if (app.name.toLowerCase() === 'settings') {
         // Inline content for Settings.
         contentDiv.innerHTML = `
           <h3>Change Background</h3>
           <input type="text" id="bg-url" placeholder="Enter image URL (PNG, GIF, etc.)">
           <button onclick="changeBackground()">Apply</button>
         `;
-      } else if(app.name.toLowerCase() === 'app store') {
+      } else if (app.name.toLowerCase() === 'app store') {
         // Inline content for App Store.
         contentDiv.innerHTML = `
           <h3>App Store</h3>
@@ -391,6 +442,44 @@
         storeList.appendChild(appDiv);
       });
     }
+
+    // --- Custom Context Menu Logic ---
+    let currentContextApp = null;
+    function showContextMenu(x, y, app) {
+      currentContextApp = app;
+      const menu = document.getElementById('custom-context-menu');
+      menu.style.left = x + 'px';
+      menu.style.top = y + 'px';
+      menu.style.display = 'block';
+    }
+
+    function hideContextMenu() {
+      const menu = document.getElementById('custom-context-menu');
+      menu.style.display = 'none';
+      currentContextApp = null;
+    }
+
+    // When clicking the "Delete" option.
+    document.getElementById('delete-option').addEventListener('click', function(e) {
+      if (currentContextApp && !currentContextApp.preinstalled) {
+        currentContextApp.installed = false;
+        saveInstalledApps();
+        renderDesktopIcons();
+        renderTaskbarIcons();
+        renderAppStoreList();
+      }
+      hideContextMenu();
+    });
+
+    // Prevent clicks on the context menu from closing it.
+    document.getElementById('custom-context-menu').addEventListener('click', function(e) {
+      e.stopPropagation();
+    });
+
+    // Hide the context menu on any click outside.
+    document.addEventListener('click', function(e) {
+      hideContextMenu();
+    });
 
     // On page load, load saved installed states, render icons, and restore saved background.
     window.onload = function() {

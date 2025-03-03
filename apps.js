@@ -41,5 +41,12 @@ const appList = [
     content: "", // inline content for App Store.
     installed: true,
     preinstalled: true
+  },
+  {
+    name: "Music",
+    icon: "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/2a6d0f51-0cb3-4260-beb2-04239bc8845d/deqmc77-33847091-bb12-4bf3-9621-98ea50575f22.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzJhNmQwZjUxLTBjYjMtNDI2MC1iZWIyLTA0MjM5YmM4ODQ1ZFwvZGVxbWM3Ny0zMzg0NzA5MS1iYjEyLTRiZjMtOTYyMS05OGVhNTA1NzVmMjIucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0.SEnWzPyXULKOVxOI_QniXTAWNNLli2rme0cpo3dFoRo",
+    content: "app/music.html",
+    installed: false,
+    preinstalled: false
   }
 ];

@@ -18,8 +18,8 @@ const appList = [
     name: "ChatGPT",
     icon: "https://img.icons8.com/?size=512&id=u9JE2GppVZoD&format=png",
     content: "app/chatgpt.html",
-    installed: true,
-    preinstalled: true
+    installed: false,
+    preinstalled: false
   },
   {
     name: "Control Panel",

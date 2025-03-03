@@ -247,7 +247,6 @@
       closeButton.textContent = 'X';
       closeButton.onclick = () => { windowDiv.style.display = 'none'; };
       titleBar.appendChild(closeButton);
-      // (No uninstall button here – uninstall is now via right-click on icon.)
       // Create the content area.
       const contentDiv = document.createElement('div');
       contentDiv.classList.add('content');
@@ -337,19 +336,39 @@
       }
       uninstalledApps.forEach(app => {
         const appDiv = document.createElement('div');
-        appDiv.style.display = 'flex';
-        appDiv.style.alignItems = 'center';
+        appDiv.style.border = '1px solid #ccc';
+        appDiv.style.padding = '10px';
         appDiv.style.marginBottom = '10px';
+        
+        // Top row with icon and app name.
+        const topRow = document.createElement('div');
+        topRow.style.display = 'flex';
+        topRow.style.alignItems = 'center';
+
         const img = document.createElement('img');
         img.src = app.icon;
         img.style.width = '40px';
         img.style.height = '40px';
         img.style.marginRight = '10px';
+
         const name = document.createElement('span');
         name.textContent = app.name;
+        name.style.fontWeight = 'bold';
+
+        topRow.appendChild(img);
+        topRow.appendChild(name);
+
+        // Description.
+        const description = document.createElement('div');
+        description.textContent = app.description;
+        description.style.fontSize = '12px';
+        description.style.color = '#555';
+        description.style.marginTop = '5px';
+
+        // Install button.
         const installButton = document.createElement('button');
         installButton.textContent = 'Install';
-        installButton.style.marginLeft = 'auto';
+        installButton.style.marginTop = '10px';
         installButton.onclick = () => {
           app.installed = true;
           saveInstalledApps();
@@ -357,8 +376,9 @@
           renderTaskbarIcons();
           renderAppStoreList();
         };
-        appDiv.appendChild(img);
-        appDiv.appendChild(name);
+
+        appDiv.appendChild(topRow);
+        appDiv.appendChild(description);
         appDiv.appendChild(installButton);
         storeList.appendChild(appDiv);
       });

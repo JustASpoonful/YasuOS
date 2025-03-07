@@ -4,22 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Maxwell Xcel OS 5</title>
-<!--  <meta http-equiv="Content-Security-Policy" content="
-        script-src 'self' 'nonce-123456';
-        style-src 'self';
-        object-src 'none';
-        connect-src 'self';
-    "> 
-    
-   <!-- <script nonce="123456">
-        // Prevent extensions from injecting scripts
-        Object.freeze(document);
-        Object.freeze(document.documentElement);
-        Object.freeze(document.head);
-        Object.freeze(document.body);
-    -->
-        
-    </script>
+
+    <script>
+    // Attach a beforeunload event listener that asks for confirmation.
+    window.addEventListener("beforeunload", function (e) {
+      // Standard message (browsers may ignore this custom text).
+      var confirmationMessage = "Are you sure you want to leave this page?";
+      
+      // Some browsers require setting returnValue of the event.
+      e.returnValue = confirmationMessage; 
+      
+      // Return the confirmation message.
+      return confirmationMessage;
+    });
+  </script>
     
     <style>
         /* Ensure the iframe takes up the full screen */

@@ -54,6 +54,6 @@ const appList = [
     content: "app/pro.html",
     installed: false,
     preinstalled: false,
-    description: "Unlock advanced features."
+    description: "Unlock a lot more features and security settings! "
   }
 ];

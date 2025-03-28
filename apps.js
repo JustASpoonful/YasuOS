@@ -55,5 +55,13 @@ const appList = [
     installed: false,
     preinstalled: false,
     description: "Unlock a lot more features and security settings! "
+  },
+  {
+    name: "Discord Mini",
+    icon: "https://logos-world.net/wp-content/uploads/2020/12/Discord-Emblem.png",
+    content: "app/pro.html",
+    installed: false,
+    preinstalled: false,
+    description: "Be able to talk to your friends, this is just minified discord. This will become a full version of discord in the future!"
   }
 ];

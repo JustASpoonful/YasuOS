@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Simple PeerJS Chat</title>
+  <title>PeerJS</title>
   <style>
     body {
       background-color: #36393f;
@@ -16,6 +16,7 @@
     }
     #myPeerId {
       font-weight: bold;
+      font-size: 14px;
     }
     #chat {
       margin-top: 20px;
@@ -52,11 +53,41 @@
       color: white;
       cursor: pointer;
     }
+
+    /* Popup Styles */
+    #namePopup {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0, 0, 0, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+    }
+    #namePopupContent {
+      background-color: #2f3136;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+    }
+    #namePopupContent input {
+      width: 200px;
+    }
   </style>
 </head>
 <body>
+  <div id="namePopup">
+    <div id="namePopupContent">
+      <h2>Enter Display Name</h2>
+      <input type="text" id="displayNameInput" placeholder="Your name">
+      <br>
+      <button id="saveNameBtn">Save</button>
+    </div>
+  </div>
+
   <h1>Simple PeerJS Chat</h1>
-  <p>Copy your Peer ID, then give it to your friend, your friend will paste your peer id into the 'Enter Peer id to connect' text box, and you will have to do the same! Eneter your friends peer id into the text box.</p>
+  <p>Share your Peer ID with your friend. Then paste your friend's ID below to connect.</p>
   <p>Your Peer ID: <span id="myPeerId">...</span></p>
   <input type="text" id="peerIdInput" placeholder="Enter peer ID to connect">
   <button id="connectBtn">Connect</button>
@@ -67,13 +98,32 @@
     <button id="sendBtn">Send</button>
   </div>
 
-  <!-- Include PeerJS library from CDN -->
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <script>
-    // Create a new PeerJS peer using the default cloud server.
-    const peer = new Peer();
+    let yourName = localStorage.getItem('displayName');
+    const namePopup = document.getElementById('namePopup');
+    const displayNameInput = document.getElementById('displayNameInput');
+    const saveNameBtn = document.getElementById('saveNameBtn');
 
-    // DOM Elements
+    // Show popup only if no name saved
+    if (!yourName) {
+      namePopup.style.display = 'flex';
+    } else {
+      namePopup.style.display = 'none';
+    }
+
+    saveNameBtn.onclick = () => {
+      const input = displayNameInput.value.trim();
+      if (input) {
+        yourName = input;
+        localStorage.setItem('displayName', yourName);
+        namePopup.style.display = 'none';
+      }
+    };
+
+    const myShortId = 'id-' + Math.random().toString(36).substring(2, 6);
+    const peer = new Peer(myShortId);
+
     const myPeerIdSpan = document.getElementById('myPeerId');
     const peerIdInput = document.getElementById('peerIdInput');
     const connectBtn = document.getElementById('connectBtn');
@@ -82,54 +132,63 @@
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
 
-    let conn; // Will hold our connection
+    let conn;
+    let peerName = "Peer";
 
-    // When the peer connection is ready, display your Peer ID.
     peer.on('open', id => {
       myPeerIdSpan.textContent = id;
     });
 
-    // Listen for incoming connections.
     peer.on('connection', connection => {
       conn = connection;
-      setupConnection();
+      conn.on('open', () => {
+        conn.send(JSON.stringify({ type: 'intro', name: yourName }));
+        setupConnection();
+      });
     });
 
-    // Connect to a peer when clicking the "Connect" button.
     connectBtn.addEventListener('click', () => {
       const remoteId = peerIdInput.value.trim();
       if (remoteId) {
         conn = peer.connect(remoteId);
-        conn.on('open', setupConnection);
+        conn.on('open', () => {
+          conn.send(JSON.stringify({ type: 'intro', name: yourName }));
+          setupConnection();
+        });
       }
     });
 
-    // Setup connection event handlers.
     function setupConnection() {
       chatDiv.style.display = 'block';
       conn.on('data', data => {
-        addMessage('Peer: ' + data);
+        try {
+          const msg = JSON.parse(data);
+          if (msg.type === 'intro') {
+            peerName = msg.name;
+          } else if (msg.type === 'message') {
+            addMessage(peerName + ': ' + msg.text);
+          }
+        } catch (e) {
+          console.error('Invalid message:', data);
+        }
       });
     }
 
-    // Send a message when clicking "Send".
     sendBtn.addEventListener('click', () => {
       const msg = messageInput.value.trim();
       if (msg && conn && conn.open) {
-        conn.send(msg);
-        addMessage('You: ' + msg);
+        conn.send(JSON.stringify({ type: 'message', text: msg }));
+        addMessage(yourName + ': ' + msg);
         messageInput.value = '';
       }
     });
 
-    // Also send a message when pressing Enter in the message input.
     messageInput.addEventListener('keypress', event => {
       if (event.key === 'Enter') {
         sendBtn.click();
       }
     });
 
-    // Helper function to display messages.
     function addMessage(message) {
       const li = document.createElement('li');
       li.textContent = message;

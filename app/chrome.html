@@ -1,9 +1,62 @@
-<html>
-  <head>
-    
-  </head>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Safe Browser UI</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', sans-serif; background: #222; color: #fff; }
+    .container { display: flex; flex-direction: column; height: 100vh; }
+    .address-bar { display: flex; padding: 10px; background: #333; gap: 10px; align-items: center; }
+    .address-input { flex: 1; padding: 10px; border: none; border-radius: 8px; background: #444; color: white; }
+    .go-button { padding: 10px 15px; border-radius: 8px; background: #4CAF50; cursor: pointer; }
+    .go-button:hover { background: #45a049; }
+    .iframe-container { flex: 1; padding: 10px; background: #444; border-radius: 8px; overflow: hidden; }
+    iframe { width: 100%; height: 100%; border: none; border-radius: 8px; }
+    .message { padding: 20px; background: #ff4d4d; color: #fff; border-radius: 8px; margin-top: 10px; }
+  </style>
+</head>
+<body>
 
-  <body>
-    <head>THis is a test to see if the apps work.</head>
-  </body>
+<div class="container">
+  <div class="address-bar">
+    <input class="address-input" id="urlInput" type="text" placeholder="Enter URL here" />
+    <button class="go-button" onclick="goToURL()">Go</button>
+  </div>
+  <div id="message" class="message" style="display: none;"></div>
+  <div class="iframe-container">
+    <iframe id="webFrame" src="" style="display: none;"></iframe>
+  </div>
+</div>
+
+<script>
+  // Blocklist of inappropriate URLs (e.g., adult sites)
+  const blocklist = [
+    "examplepornsite.com",
+    "anotherbadsite.com",
+    "exampleadultsite.org",
+  ];
+
+  function goToURL() {
+    const url = document.getElementById('urlInput').value;
+    const iframe = document.getElementById('webFrame');
+    const message = document.getElementById('message');
+    
+    // Check if the URL is in the blocklist
+    const isBlocked = blocklist.some(blockedSite => url.includes(blockedSite));
+    
+    if (isBlocked) {
+      message.style.display = 'block';
+      message.innerHTML = 'Access to this site is blocked for safety.';
+      iframe.style.display = 'none';
+    } else {
+      message.style.display = 'none';
+      iframe.style.display = 'block';
+      iframe.src = url;
+    }
+  }
+</script>
+
+</body>
 </html>

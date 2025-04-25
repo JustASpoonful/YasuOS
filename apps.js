@@ -63,5 +63,13 @@ const appList = [
     installed: false,
     preinstalled: false,
     description: "Be able to talk to your friends, this is just minified discord. This will become a full version of discord in the future!"
+  },
+  {
+    name: "Clock Application",
+    icon: "https://cdn3d.iconscout.com/3d/free/thumb/free-ios-clock-application-3d-logo-download-in-png-blend-fbx-gltf-file-formats--apple-pack-logos-2447862.png?",
+    content: "app/clockapp.html",
+    installed: false,
+    preinstalled: false,
+    description: "Be able to check the time down to the millisecond!"
   }
 ];

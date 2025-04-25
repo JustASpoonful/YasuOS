@@ -66,7 +66,7 @@ const appList = [
   },
   {
     name: "Clock Application",
-    icon: "https://cdn3d.iconscout.com/3d/free/thumb/free-ios-clock-application-3d-logo-download-in-png-blend-fbx-gltf-file-formats--apple-pack-logos-2447862.png?",
+    icon: "https://www.freeiconspng.com/thumbs/clock-png/clock-png-5.png",
     content: "app/clockapp.html",
     installed: false,
     preinstalled: false,

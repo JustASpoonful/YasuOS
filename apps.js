@@ -70,6 +70,6 @@ const appList = [
     content: "app/clockapp.html",
     installed: false,
     preinstalled: false,
-    description: "Be able to check the time down to the millisecond!"
+    description: "Get the most accurate time that you can possibly get! It is even more accurate than a chromebooks time."
   }
 ];

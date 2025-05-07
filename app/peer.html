@@ -2,13 +2,28 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>PeerJS Chat with Persistent ID</title>
+  <title>PeerJS Chat with Notifications</title>
   <style>
-    body { background-color: #36393f; color: #dcddde; font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+    body {
+      background-color: #36393f;
+      color: #dcddde;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
     h1 { margin-bottom: 10px; }
     #myPeerId { font-weight: bold; font-size: 14px; }
     #chat { margin-top: 20px; display: none; }
-    #messages { list-style: none; background-color: #2f3136; padding: 10px; height: 300px; overflow-y: auto; text-align: left; margin: 0 auto 10px; max-width: 600px; }
+    #messages {
+      list-style: none;
+      background-color: #2f3136;
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+      text-align: left;
+      margin: 0 auto 10px;
+      max-width: 600px;
+    }
     #messages li { margin: 5px 0; padding: 5px; border-bottom: 1px solid #555; }
     input, button { padding: 10px; margin: 5px; border: none; outline: none; }
     input { width: 300px; background-color: #40444b; color: #dcddde; }
@@ -25,7 +40,8 @@
     <div id="namePopupContent">
       <h2>Enter Display Name</h2>
       <input type="text" id="displayNameInput" placeholder="Your name">
-      <br><button id="saveNameBtn">Save</button>
+      <br>
+      <button id="saveNameBtn">Save</button>
     </div>
   </div>
 
@@ -45,90 +61,110 @@
 
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <script>
-    // Desktop Notifications
-    if ('Notification' in window) Notification.requestPermission();
+    // Notification permission
+    if ('Notification' in window) {
+      Notification.requestPermission().then(permission => {
+        console.log('Notification permission:', permission);
+      });
+    }
 
-    // Display name
     let yourName = localStorage.getItem('displayName');
     const namePopup = document.getElementById('namePopup');
     const displayNameInput = document.getElementById('displayNameInput');
-    document.getElementById('saveNameBtn').onclick = () => {
-      const v = displayNameInput.value.trim(); if (v) { yourName = v; localStorage.setItem('displayName', v); namePopup.style.display = 'none'; }
-    };
-    document.getElementById('changeNameBtn').onclick = () => { displayNameInput.value = yourName || ''; namePopup.style.display = 'flex'; };
-    if (!yourName) { namePopup.style.display = 'flex'; }
+    const saveNameBtn = document.getElementById('saveNameBtn');
+    const changeNameBtn = document.getElementById('changeNameBtn');
 
-    // Persistent Peer ID
-    let savedId = localStorage.getItem('peerId');
-    if (!savedId) {
-      savedId = 'id-' + Math.random().toString(36).slice(2,6);
-      localStorage.setItem('peerId', savedId);
+    function openNamePopup() {
+      displayNameInput.value = yourName || '';
+      namePopup.style.display = 'flex';
     }
-    const peer = new Peer(savedId);
+
+    function saveDisplayName() {
+      const input = displayNameInput.value.trim();
+      if (input) {
+        yourName = input;
+        localStorage.setItem('displayName', yourName);
+        namePopup.style.display = 'none';
+      }
+    }
+
+    if (!yourName) openNamePopup();
+    saveNameBtn.onclick = saveDisplayName;
+    changeNameBtn.onclick = openNamePopup;
+
+    const peer = new Peer('id-' + Math.random().toString(36).slice(2,6));
     const myPeerIdSpan = document.getElementById('myPeerId');
-    myPeerIdSpan.textContent = '...';
-
-    // Auto-reconnect logic
-    peer.on('open', id => {
-      myPeerIdSpan.textContent = id;
-      // Attempt reconnection to last remote
-      const lastRemote = localStorage.getItem('lastRemote');
-      if (lastRemote) connectToPeer(lastRemote);
-    });
-    peer.on('disconnected', () => {
-      console.log('Disconnected, retrying...');
-      peer.reconnect();
-    });
-
-    let conn, peerName = 'Peer';
+    const peerIdInput = document.getElementById('peerIdInput');
     const connectBtn = document.getElementById('connectBtn');
-    connectBtn.onclick = () => {
-      const remote = document.getElementById('peerIdInput').value.trim();
-      if (remote) connectToPeer(remote);
-    };
+    const chatDiv = document.getElementById('chat');
+    const messagesUl = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    let conn, peerName = 'Peer';
 
-    function connectToPeer(remote) {
-      if (conn && conn.open) conn.close();
-      conn = peer.connect(remote);
-      localStorage.setItem('lastRemote', remote);
+    peer.on('open', id => myPeerIdSpan.textContent = id);
+
+    peer.on('connection', connection => {
+      conn = connection;
       conn.on('open', () => {
-        setupConnection();
         conn.send(JSON.stringify({ type:'intro', name: yourName }));
-        showNotification('Connected', `Connected to ${remote}`);
+        setupConnection();
+        showNotification('Connected', 'New connection!');
       });
-    }
+    });
+
+    connectBtn.addEventListener('click', () => {
+      const remoteId = peerIdInput.value.trim();
+      if (!remoteId) return;
+      conn = peer.connect(remoteId);
+      conn.on('open', () => {
+        conn.send(JSON.stringify({ type:'intro', name: yourName }));
+        setupConnection();
+        showNotification('Connected', `Connected to ${remoteId}`);
+      });
+    });
 
     function setupConnection() {
-      document.getElementById('chat').style.display = 'block';
+      chatDiv.style.display = 'block';
       conn.on('data', data => {
-        try {
-          const msg = JSON.parse(data);
-          if (msg.type === 'intro') peerName = msg.name;
-          if (msg.type === 'message') displayMessage(`${peerName}: ${msg.text}`);
-        } catch(e){}
+        let msg;
+        try { msg = JSON.parse(data); }
+        catch { return; }
+        if (msg.type === 'intro') peerName = msg.name;
+        if (msg.type === 'message') {
+          const fullMsg = `${peerName}: ${msg.text}`;
+          addMessage(fullMsg);
+        }
       });
     }
 
-    document.getElementById('sendBtn').onclick = () => {
-      const input = document.getElementById('messageInput');
-      const text = input.value.trim();
-      if (text && conn && conn.open) {
-        conn.send(JSON.stringify({ type:'message', text }));
-        displayMessage(`${yourName}: ${text}`);
-        input.value = '';
-      }
-    };
-    document.getElementById('messageInput').addEventListener('keypress', e => { if (e.key==='Enter') document.getElementById('sendBtn').click(); });
+    sendBtn.addEventListener('click', () => {
+      const text = messageInput.value.trim();
+      if (!text || !conn || !conn.open) return;
+      conn.send(JSON.stringify({ type:'message', text }));
+      addMessage(`${yourName}: ${text}`);
+      messageInput.value = '';
+    });
 
-    function displayMessage(msg) {
-      const li = document.createElement('li'); li.textContent = msg;
-      document.getElementById('messages').appendChild(li);
-      document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
-      if (Notification.permission==='granted' && document.hidden) showNotification('New Message', msg);
+    messageInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendBtn.click();
+    });
+
+    function addMessage(msg) {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      messagesUl.appendChild(li);
+      messagesUl.scrollTop = messagesUl.scrollHeight;
+      // notify if page is hidden
+      if (Notification.permission === 'granted' && document.hidden) {
+        showNotification('New Message', msg);
+      }
     }
 
     function showNotification(title, body) {
-      if (Notification.permission==='granted') new Notification(title, { body });
+      if (Notification.permission === 'granted') {
+        new Notification(title, { body });
+      }
     }
   </script>
 </body>

@@ -11,17 +11,9 @@
       text-align: center;
       padding: 20px;
     }
-    h1 {
-      margin-bottom: 10px;
-    }
-    #myPeerId {
-      font-weight: bold;
-      font-size: 14px;
-    }
-    #chat {
-      margin-top: 20px;
-      display: none;
-    }
+    h1 { margin-bottom: 10px; }
+    #myPeerId { font-weight: bold; font-size: 14px; }
+    #chat { margin-top: 20px; display: none; }
     #messages {
       list-style: none;
       background-color: #2f3136;
@@ -32,48 +24,14 @@
       margin: 0 auto 10px;
       max-width: 600px;
     }
-    #messages li {
-      margin: 5px 0;
-      padding: 5px;
-      border-bottom: 1px solid #555;
-    }
-    input, button {
-      padding: 10px;
-      margin: 5px;
-      border: none;
-      outline: none;
-    }
-    input {
-      width: 300px;
-      background-color: #40444b;
-      color: #dcddde;
-    }
-    button {
-      background-color: #7289da;
-      color: white;
-      cursor: pointer;
-    }
-
+    #messages li { margin: 5px 0; padding: 5px; border-bottom: 1px solid #555; }
+    input, button { padding: 10px; margin: 5px; border: none; outline: none; }
+    input { width: 300px; background-color: #40444b; color: #dcddde; }
+    button { background-color: #7289da; color: white; cursor: pointer; }
     /* Popup Styles */
-    #namePopup {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background-color: rgba(0, 0, 0, 0.8);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
-    #namePopupContent {
-      background-color: #2f3136;
-      padding: 30px;
-      border-radius: 10px;
-      text-align: center;
-    }
-    #namePopupContent input {
-      width: 200px;
-    }
+    #namePopup { position: fixed; top:0; left:0; width:100%; height:100%; background-color: rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:999; }
+    #namePopupContent { background-color: #2f3136; padding: 30px; border-radius: 10px; text-align: center; }
+    #namePopupContent input { width: 200px; }
   </style>
 </head>
 <body>
@@ -103,9 +61,11 @@
 
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <script>
-    // Request desktop notification permission
+    // Notification permission
     if ('Notification' in window) {
-      Notification.requestPermission();
+      Notification.requestPermission().then(permission => {
+        console.log('Notification permission:', permission);
+      });
     }
 
     let yourName = localStorage.getItem('displayName');
@@ -128,16 +88,11 @@
       }
     }
 
-    if (!yourName) {
-      openNamePopup();
-    }
-
+    if (!yourName) openNamePopup();
     saveNameBtn.onclick = saveDisplayName;
     changeNameBtn.onclick = openNamePopup;
 
-    const myShortId = 'id-' + Math.random().toString(36).substring(2, 6);
-    const peer = new Peer(myShortId);
-
+    const peer = new Peer('id-' + Math.random().toString(36).slice(2,6));
     const myPeerIdSpan = document.getElementById('myPeerId');
     const peerIdInput = document.getElementById('peerIdInput');
     const connectBtn = document.getElementById('connectBtn');
@@ -145,80 +100,69 @@
     const messagesUl = document.getElementById('messages');
     const messageInput = document.getElementById('messageInput');
     const sendBtn = document.getElementById('sendBtn');
+    let conn, peerName = 'Peer';
 
-    let conn;
-    let peerName = "Peer";
-
-    peer.on('open', id => {
-      myPeerIdSpan.textContent = id;
-    });
+    peer.on('open', id => myPeerIdSpan.textContent = id);
 
     peer.on('connection', connection => {
       conn = connection;
       conn.on('open', () => {
-        conn.send(JSON.stringify({ type: 'intro', name: yourName }));
+        conn.send(JSON.stringify({ type:'intro', name: yourName }));
         setupConnection();
-        showNotification('Connected', 'You have a new connection!');
+        showNotification('Connected', 'New connection!');
       });
     });
 
     connectBtn.addEventListener('click', () => {
       const remoteId = peerIdInput.value.trim();
-      if (remoteId) {
-        conn = peer.connect(remoteId);
-        conn.on('open', () => {
-          conn.send(JSON.stringify({ type: 'intro', name: yourName }));
-          setupConnection();
-          showNotification('Connected', 'Connection established with ' + remoteId);
-        });
-      }
+      if (!remoteId) return;
+      conn = peer.connect(remoteId);
+      conn.on('open', () => {
+        conn.send(JSON.stringify({ type:'intro', name: yourName }));
+        setupConnection();
+        showNotification('Connected', `Connected to ${remoteId}`);
+      });
     });
 
     function setupConnection() {
       chatDiv.style.display = 'block';
       conn.on('data', data => {
-        try {
-          const msg = JSON.parse(data);
-          if (msg.type === 'intro') {
-            peerName = msg.name;
-          } else if (msg.type === 'message') {
-            const fullMsg = peerName + ': ' + msg.text;
-            addMessage(fullMsg);
-          }
-        } catch (e) {
-          console.error('Invalid message:', data);
+        let msg;
+        try { msg = JSON.parse(data); }
+        catch { return; }
+        if (msg.type === 'intro') peerName = msg.name;
+        if (msg.type === 'message') {
+          const fullMsg = `${peerName}: ${msg.text}`;
+          addMessage(fullMsg);
         }
       });
     }
 
     sendBtn.addEventListener('click', () => {
-      const msg = messageInput.value.trim();
-      if (msg && conn && conn.open) {
-        conn.send(JSON.stringify({ type: 'message', text: msg }));
-        addMessage(yourName + ': ' + msg);
-        messageInput.value = '';
-      }
+      const text = messageInput.value.trim();
+      if (!text || !conn || !conn.open) return;
+      conn.send(JSON.stringify({ type:'message', text }));
+      addMessage(`${yourName}: ${text}`);
+      messageInput.value = '';
     });
 
-    messageInput.addEventListener('keypress', event => {
-      if (event.key === 'Enter') {
-        sendBtn.click();
-      }
+    messageInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendBtn.click();
     });
 
-    function addMessage(message) {
+    function addMessage(msg) {
       const li = document.createElement('li');
-      li.textContent = message;
+      li.textContent = msg;
       messagesUl.appendChild(li);
       messagesUl.scrollTop = messagesUl.scrollHeight;
-      // Show desktop notification for new messages if permission granted and window not focused
-      if (Notification.permission === 'granted' && !document.hasFocus()) {
-        showNotification('New Message', message);
+      // notify if page is hidden
+      if (Notification.permission === 'granted' && document.hidden) {
+        showNotification('New Message', msg);
       }
     }
 
     function showNotification(title, body) {
-      if ('Notification' in window && Notification.permission === 'granted') {
+      if (Notification.permission === 'granted') {
         new Notification(title, { body });
       }
     }

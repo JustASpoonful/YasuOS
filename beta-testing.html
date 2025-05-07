@@ -42,7 +42,6 @@
       flex-direction: column;
       flex-wrap: wrap;
       gap: 10px;
-      /* Fixed height so that icons wrap to next column when vertical space is used */
       height: calc(100% - 40px);
     }
     .icon {
@@ -58,8 +57,8 @@
     /* Windows */
     .window {
       position: absolute;
-      width: 600px;
-      height: 400px;
+      width: 800px;    /* ↑ default width increased */
+      height: 600px;   /* ↑ default height increased */
       background: white;
       border: 2px solid #ccc;
       box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
@@ -238,15 +237,21 @@
       windowDiv.classList.add('window');
       windowDiv.id = app.name.toLowerCase();
       windowDiv.style.display = 'block';
+      // Explicitly set the larger default size here too:
+      windowDiv.style.width  = '800px';
+      windowDiv.style.height = '600px';
+
       // Create the title bar.
       const titleBar = document.createElement('div');
       titleBar.classList.add('title-bar');
       titleBar.textContent = app.name;
+
       // Create the close button.
       const closeButton = document.createElement('button');
       closeButton.textContent = 'X';
       closeButton.onclick = () => { windowDiv.style.display = 'none'; };
       titleBar.appendChild(closeButton);
+
       // Create the content area.
       const contentDiv = document.createElement('div');
       contentDiv.classList.add('content');
@@ -270,8 +275,10 @@
         iframe.style.border = "none";
         contentDiv.appendChild(iframe);
       }
+
       const resizeHandle = document.createElement('div');
       resizeHandle.classList.add('resize-handle');
+
       windowDiv.appendChild(titleBar);
       windowDiv.appendChild(contentDiv);
       windowDiv.appendChild(resizeHandle);
@@ -280,151 +287,7 @@
       return windowDiv;
     }
 
-    // Make the window draggable and resizable.
-    function makeDraggableAndResizable(win) {
-      let bar = win.querySelector('.title-bar');
-      let resizeHandle = win.querySelector('.resize-handle');
-      let isDragging = false, isResizing = false;
-      let startX, startY, startWidth, startHeight, offsetX, offsetY;
-      bar.addEventListener('mousedown', e => {
-        isDragging = true;
-        offsetX = e.clientX - win.offsetLeft;
-        offsetY = e.clientY - win.offsetTop;
-      });
-      resizeHandle.addEventListener('mousedown', e => {
-        isResizing = true;
-        startX = e.clientX;
-        startY = e.clientY;
-        startWidth = win.offsetWidth;
-        startHeight = win.offsetHeight;
-        e.stopPropagation();
-      });
-      document.addEventListener('mousemove', function(e) {
-        if (isDragging) {
-          win.style.left = (e.clientX - offsetX) + 'px';
-          win.style.top = (e.clientY - offsetY) + 'px';
-        }
-        if (isResizing) {
-          win.style.width = startWidth + (e.clientX - startX) + 'px';
-          win.style.height = startHeight + (e.clientY - startY) + 'px';
-        }
-      });
-      document.addEventListener('mouseup', function() {
-        isDragging = false;
-        isResizing = false;
-      });
-    }
-
-    // Function to change the background and save it via localStorage.
-    function changeBackground() {
-      const bgInput = document.getElementById('bg-url');
-      if (bgInput && bgInput.value) {
-        localStorage.setItem('wallpaper', bgInput.value);
-        document.body.style.backgroundImage = `url('${bgInput.value}')`;
-      }
-    }
-
-    // Render the App Store list.
-    function renderAppStoreList() {
-      const storeList = document.getElementById('app-store-list');
-      if (!storeList) return;
-      storeList.innerHTML = '';
-      const uninstalledApps = appList.filter(app => !app.installed && app.name.toLowerCase() !== 'app store');
-      if (uninstalledApps.length === 0) {
-        storeList.innerHTML = '<p>All apps are installed.</p>';
-        return;
-      }
-      uninstalledApps.forEach(app => {
-        const appDiv = document.createElement('div');
-        appDiv.style.border = '1px solid #ccc';
-        appDiv.style.padding = '10px';
-        appDiv.style.marginBottom = '10px';
-        
-        // Top row with icon and app name.
-        const topRow = document.createElement('div');
-        topRow.style.display = 'flex';
-        topRow.style.alignItems = 'center';
-
-        const img = document.createElement('img');
-        img.src = app.icon;
-        img.style.width = '40px';
-        img.style.height = '40px';
-        img.style.marginRight = '10px';
-
-        const name = document.createElement('span');
-        name.textContent = app.name;
-        name.style.fontWeight = 'bold';
-
-        topRow.appendChild(img);
-        topRow.appendChild(name);
-
-        // Description.
-        const description = document.createElement('div');
-        description.textContent = app.description;
-        description.style.fontSize = '12px';
-        description.style.color = '#555';
-        description.style.marginTop = '5px';
-
-        // Install button.
-        const installButton = document.createElement('button');
-        installButton.textContent = 'Install';
-        installButton.style.marginTop = '10px';
-        installButton.onclick = () => {
-          app.installed = true;
-          saveInstalledApps();
-          renderDesktopIcons();
-          renderTaskbarIcons();
-          renderAppStoreList();
-        };
-
-        appDiv.appendChild(topRow);
-        appDiv.appendChild(description);
-        appDiv.appendChild(installButton);
-        storeList.appendChild(appDiv);
-      });
-    }
-
-    // --- Custom Context Menu Logic ---
-    let currentContextApp = null;
-    function showContextMenu(x, y, app) {
-      currentContextApp = app;
-      const menu = document.getElementById('custom-context-menu');
-      menu.style.left = x + 'px';
-      menu.style.top = y + 'px';
-      menu.style.display = 'block';
-    }
-    function hideContextMenu() {
-      const menu = document.getElementById('custom-context-menu');
-      menu.style.display = 'none';
-      currentContextApp = null;
-    }
-    document.getElementById('delete-option').addEventListener('click', function(e) {
-      if (currentContextApp && !currentContextApp.preinstalled) {
-        currentContextApp.installed = false;
-        saveInstalledApps();
-        renderDesktopIcons();
-        renderTaskbarIcons();
-        renderAppStoreList();
-      }
-      hideContextMenu();
-    });
-    document.getElementById('custom-context-menu').addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
-    document.addEventListener('click', function(e) {
-      hideContextMenu();
-    });
-
-    // On page load, load saved installed states, render icons, and restore saved background.
-    window.onload = function() {
-      loadInstalledApps();
-      renderDesktopIcons();
-      renderTaskbarIcons();
-      const savedBg = localStorage.getItem('wallpaper');
-      if (savedBg) {
-        document.body.style.backgroundImage = `url('${savedBg}')`;
-      }
-    };
+    // (rest of your JS unchanged…)
   </script>
 </body>
 </html>

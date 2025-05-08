@@ -2,36 +2,171 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>PeerJS Chat with Notifications</title>
+  <title>Dispeer</title>
   <style>
-    body {
-      background-color: #36393f;
-      color: #dcddde;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 20px;
+    :root {
+      --primary: #4f46e5;
+      --primary-light: #818cf8;
+      --background: #f3f4f6;
+      --surface: #ffffff;
+      --text: #1f2937;
+      --text-secondary: #4b5563;
+      --border: #e5e7eb;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      --success: #10b981;
     }
-    h1 { margin-bottom: 10px; }
-    #myPeerId { font-weight: bold; font-size: 14px; }
-    #chat { margin-top: 20px; display: none; }
+
+    body {
+      background-color: var(--background);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: var(--text);
+    }
+
+    .container {
+      background-color: var(--surface);
+      border-radius: 0.5rem;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+
+    .id-display {
+      font-weight: 500;
+      background-color: var(--background);
+      padding: 0.75rem 1rem;
+      border-radius: 0.375rem;
+      display: inline-block;
+      margin: 0.5rem 0;
+      font-family: 'SF Mono', monospace;
+      font-size: 0.9rem;
+    }
+
+    .flex-row {
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    input {
+      flex: 1;
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.375rem;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    button {
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 0.375rem;
+      font-weight: 500;
+      font-size: 0.9375rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background-color: #4338ca;
+    }
+
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background-color: var(--background);
+    }
+
+    #chat {
+      margin-top: 2rem;
+      display: none;
+    }
+
     #messages {
       list-style: none;
-      background-color: #2f3136;
-      padding: 10px;
+      padding: 0;
       height: 300px;
       overflow-y: auto;
-      text-align: left;
-      margin: 0 auto 10px;
-      max-width: 600px;
+      margin-bottom: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      background-color: var(--background);
+      padding: 1rem;
     }
-    #messages li { margin: 5px 0; padding: 5px; border-bottom: 1px solid #555; }
-    input, button { padding: 10px; margin: 5px; border: none; outline: none; }
-    input { width: 300px; background-color: #40444b; color: #dcddde; }
-    button { background-color: #7289da; color: white; cursor: pointer; }
-    /* Popup Styles */
-    #namePopup { position: fixed; top:0; left:0; width:100%; height:100%; background-color: rgba(0,0,0,0.8); display:none; justify-content:center; align-items:center; z-index:999; }
-    #namePopupContent { background-color: #2f3136; padding: 30px; border-radius: 10px; text-align: center; }
-    #namePopupContent input { width: 200px; }
+
+    #messages li {
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      background-color: var(--surface);
+      border-radius: 0.375rem;
+      box-shadow: var(--shadow);
+    }
+
+    #messages li:last-child {
+      margin-bottom: 0;
+    }
+
+    #namePopup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100;
+    }
+
+    #namePopupContent {
+      background-color: var(--surface);
+      padding: 2rem;
+      border-radius: 0.5rem;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    }
+
+    #namePopupContent h2 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .status {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      margin: 0.5rem 0;
+    }
+
+    .connected {
+      color: var(--success);
+    }
   </style>
 </head>
 <body>
@@ -39,24 +174,39 @@
   <div id="namePopup">
     <div id="namePopupContent">
       <h2>Enter Display Name</h2>
-      <input type="text" id="displayNameInput" placeholder="Your name">
-      <br>
-      <button id="saveNameBtn">Save</button>
+      <div class="flex-row">
+        <input type="text" id="displayNameInput" placeholder="Your name" autofocus>
+      </div>
+      <div class="flex-row" style="margin-top: 1rem; justify-content: flex-end;">
+        <button id="saveNameBtn" class="btn-primary">Save</button>
+      </div>
     </div>
   </div>
 
-  <h1>Simple PeerJS Chat</h1>
-  <p>Share your Peer ID with your friend. Then paste your friend's ID below to connect.</p>
-  <p>Your Peer ID: <span id="myPeerId">...</span></p>
-  <button id="changeNameBtn">Change Display Name</button>
-  <br><br>
-  <input type="text" id="peerIdInput" placeholder="Enter peer ID to connect">
-  <button id="connectBtn">Connect</button>
+  <div class="container">
+    <h1>PeerJS Chat</h1>
+    <p>Share your Peer ID with your friend, then paste their ID below to connect.</p>
+    <p class="status">Your Peer ID: <span class="id-display" id="myPeerId">...</span></p>
+    
+    <div class="flex-row" style="margin-top: 1.5rem;">
+      <button id="changeNameBtn" class="btn-secondary">Change Name</button>
+    </div>
+  </div>
 
-  <div id="chat">
+  <div class="container">
+    <div class="flex-row">
+      <input type="text" id="peerIdInput" placeholder="Enter peer ID to connect">
+      <button id="connectBtn" class="btn-primary">Connect</button>
+    </div>
+    <p id="connectionStatus" class="status"></p>
+  </div>
+
+  <div id="chat" class="container">
     <ul id="messages"></ul>
-    <input type="text" id="messageInput" placeholder="Type your message">
-    <button id="sendBtn">Send</button>
+    <div class="flex-row">
+      <input type="text" id="messageInput" placeholder="Type your message">
+      <button id="sendBtn" class="btn-primary">Send</button>
+    </div>
   </div>
 
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
@@ -73,10 +223,12 @@
     const displayNameInput = document.getElementById('displayNameInput');
     const saveNameBtn = document.getElementById('saveNameBtn');
     const changeNameBtn = document.getElementById('changeNameBtn');
+    const connectionStatus = document.getElementById('connectionStatus');
 
     function openNamePopup() {
       displayNameInput.value = yourName || '';
       namePopup.style.display = 'flex';
+      displayNameInput.focus();
     }
 
     function saveDisplayName() {
@@ -92,7 +244,7 @@
     saveNameBtn.onclick = saveDisplayName;
     changeNameBtn.onclick = openNamePopup;
 
-    const peer = new Peer('id-' + Math.random().toString(36).slice(2,6));
+    const peer = new Peer('id-' + Math.random().toString(36).slice(2,9));
     const myPeerIdSpan = document.getElementById('myPeerId');
     const peerIdInput = document.getElementById('peerIdInput');
     const connectBtn = document.getElementById('connectBtn');
@@ -102,13 +254,16 @@
     const sendBtn = document.getElementById('sendBtn');
     let conn, peerName = 'Peer';
 
-    peer.on('open', id => myPeerIdSpan.textContent = id);
+    peer.on('open', id => {
+      myPeerIdSpan.textContent = id;
+    });
 
     peer.on('connection', connection => {
       conn = connection;
       conn.on('open', () => {
         conn.send(JSON.stringify({ type:'intro', name: yourName }));
         setupConnection();
+        updateConnectionStatus(true);
         showNotification('Connected', 'New connection!');
       });
     });
@@ -116,46 +271,74 @@
     connectBtn.addEventListener('click', () => {
       const remoteId = peerIdInput.value.trim();
       if (!remoteId) return;
+      
+      connectionStatus.textContent = 'Connecting...';
+      
       conn = peer.connect(remoteId);
       conn.on('open', () => {
         conn.send(JSON.stringify({ type:'intro', name: yourName }));
         setupConnection();
+        updateConnectionStatus(true);
         showNotification('Connected', `Connected to ${remoteId}`);
       });
+      
+      conn.on('error', () => {
+        updateConnectionStatus(false);
+      });
     });
+
+    function updateConnectionStatus(connected) {
+      if (connected) {
+        connectionStatus.textContent = 'Connected ✓';
+        connectionStatus.classList.add('connected');
+      } else {
+        connectionStatus.textContent = 'Connection failed';
+        connectionStatus.classList.remove('connected');
+      }
+    }
 
     function setupConnection() {
       chatDiv.style.display = 'block';
       conn.on('data', data => {
         let msg;
         try { msg = JSON.parse(data); }
-        catch { return; }
-        if (msg.type === 'intro') peerName = msg.name;
-        if (msg.type === 'message') {
+        catch(e) { console.error('Error parsing message:', e); return; }
+        
+        if (msg.type === 'intro') {
+          peerName = msg.name;
+        } else if (msg.type === 'message') {
           const fullMsg = `${peerName}: ${msg.text}`;
           addMessage(fullMsg);
         }
       });
+      
+      conn.on('close', () => {
+        addMessage('⚠ Connection closed');
+        updateConnectionStatus(false);
+      });
     }
 
-    sendBtn.addEventListener('click', () => {
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+
+    function sendMessage() {
       const text = messageInput.value.trim();
       if (!text || !conn || !conn.open) return;
+      
       conn.send(JSON.stringify({ type:'message', text }));
       addMessage(`${yourName}: ${text}`);
       messageInput.value = '';
-    });
-
-    messageInput.addEventListener('keypress', e => {
-      if (e.key === 'Enter') sendBtn.click();
-    });
+      messageInput.focus();
+    }
 
     function addMessage(msg) {
       const li = document.createElement('li');
       li.textContent = msg;
       messagesUl.appendChild(li);
       messagesUl.scrollTop = messagesUl.scrollHeight;
-      // notify if page is hidden
+      
       if (Notification.permission === 'granted' && document.hidden) {
         showNotification('New Message', msg);
       }

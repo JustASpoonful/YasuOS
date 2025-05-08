@@ -57,8 +57,8 @@ const appList = [
     description: "Unlock a lot more features and security settings! "
   },
   {
-    name: "Peer",
-    icon: "https://logos-world.net/wp-content/uploads/2020/12/Discord-Emblem.png",
+    name: "Dispeer",
+    icon: "https://i.imgur.com/iq2y9y2.jpg",
     content: "app/peer.html",
     installed: false,
     preinstalled: false,

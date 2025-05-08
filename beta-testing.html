@@ -3,312 +3,151 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Maxwell OS 5</title>
-  <link rel="icon" type="image/x-icon" href="Win7Xcel.png">
+  <title>Desktop UI</title>
   <style>
-    body {
+    body, html {
       margin: 0;
       padding: 0;
-      background: url('https://4kwallpapers.com/images/wallpapers/macos-big-sur-apple-layers-fluidic-colorful-wwdc-stock--1455.jpg') no-repeat center center fixed;
-      background-size: cover;
-      font-family: "Segoe UI", sans-serif;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
+      background: url('https://wallpaperaccess.com/full/317501.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: sans-serif;
     }
+
+    .desktop {
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+
+    .icon {
+      width: 60px;
+      text-align: center;
+      color: white;
+      margin: 10px;
+      cursor: pointer;
+    }
+
+    .icon img {
+      width: 48px;
+      height: 48px;
+    }
+
     .taskbar {
-      position: fixed;
+      position: absolute;
       bottom: 0;
       left: 0;
-      width: 100%;
+      right: 0;
       height: 40px;
-      background: rgba(20, 20, 20, 0.8);
+      background: rgba(0, 0, 0, 0.6);
       display: flex;
       align-items: center;
       padding: 0 10px;
-      box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.5);
-      z-index: 9999;
-    }
-    .taskbar img {
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-      margin-right: 10px;
-    }
-    .desktop {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      display: flex;
-      flex-direction: column;
-      flex-wrap: wrap;
-      gap: 10px;
-      height: calc(100% - 40px);
-    }
-    .icon {
-      text-align: center;
-      cursor: pointer;
-      color: white;
-      width: 80px;
-    }
-    .icon img {
-      width: 50px;
-      height: 50px;
-    }
-    .window {
-      position: absolute;
-      width: 800px;
-      height: 600px;
-      background: white;
-      border: 2px solid #ccc;
-      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-      display: none;
-      top: 100px;
-      left: 100px;
-      z-index: 9998;
-    }
-    .window .title-bar {
-      background: #0078D7;
-      color: white;
-      padding: 5px;
-      cursor: move;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .window .title-bar button {
-      background: red;
-      color: white;
-      border: none;
-      cursor: pointer;
-      width: 20px;
-      height: 20px;
-      font-weight: bold;
-      line-height: 18px;
-      text-align: center;
-      padding: 0;
-      margin-left: 5px;
-    }
-    .window .content {
-      padding: 10px;
-      height: calc(100% - 30px);
-      overflow: auto;
-    }
-    .resize-handle {
-      width: 10px;
-      height: 10px;
-      background: gray;
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      cursor: nwse-resize;
-    }
-    #custom-context-menu {
-      position: absolute;
-      display: none;
-      z-index: 10000;
-      background: #fff;
-      border: 1px solid #ccc;
-      padding: 5px;
-      box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-    }
-    #custom-context-menu div {
-      cursor: pointer;
-      padding: 3px 10px;
-    }
-    #custom-context-menu div:hover {
-      background: #eee;
+      box-sizing: border-box;
     }
 
-    /* Start Menu */
-    #start-menu {
-      position: fixed;
-      bottom: 40px;
-      left: 10px;
-      width: 200px;
-      background: rgba(40, 40, 40, 0.95);
-      color: white;
-      border: 1px solid #444;
+    .start-button {
+      width: 30px;
+      height: 30px;
+      background: white;
+      margin-right: 10px;
+      border-radius: 5px;
+    }
+
+    #selection-box {
+      position: absolute;
+      border: 1px dashed white;
+      background-color: rgba(0, 120, 215, 0.2);
       display: none;
-      flex-direction: column;
-      z-index: 9999;
-      box-shadow: 0px 0px 8px rgba(0,0,0,0.6);
-    }
-    #start-menu div {
-      padding: 10px;
-      cursor: pointer;
-      border-bottom: 1px solid #555;
-    }
-    #start-menu div:hover {
-      background-color: #0078D7;
+      z-index: 99999;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
+  <div class="desktop">
+    <div class="icon">
+      <img src="https://icons.iconarchive.com/icons/papirus-team/papirus-places/512/folder-blue-documents-icon.png" alt="Folder" />
+      <div>My Files</div>
+    </div>
 
-  <div class="desktop"></div>
-
-  <div class="taskbar">
-    <img src="https://www.freeiconspng.com/thumbs/windows-7-icon/windows-7-icon-14.png" alt="Start Menu" id="start-button" />
+    <div class="taskbar">
+      <div class="start-button"></div>
+      <div style="margin-left:auto; display: flex; align-items: center; gap: 10px; color: white; font-size: 14px;">
+        <div id="battery-status">🔋--%</div>
+        <div id="clock">--:--</div>
+      </div>
+    </div>
   </div>
 
-  <div id="start-menu"></div>
-
-  <!-- Custom Context Menu -->
-  <div id="custom-context-menu">
-    <div id="delete-option">Delete</div>
-  </div>
-
-  <!-- External apps.js -->
-  <script src="apps.js"></script>
+  <div id="selection-box"></div>
 
   <script>
-    function loadInstalledApps() {
-      const saved = localStorage.getItem('installedApps');
-      if (saved) {
-        const installedApps = JSON.parse(saved);
-        appList.forEach(app => {
-          if (installedApps.hasOwnProperty(app.name)) {
-            app.installed = installedApps[app.name];
-          }
-        });
-      }
+    // Time Display
+    function updateClock() {
+      const now = new Date();
+      const clock = document.getElementById("clock");
+      const hours = now.getHours().toString().padStart(2, '0');
+      const minutes = now.getMinutes().toString().padStart(2, '0');
+      clock.textContent = `${hours}:${minutes}`;
     }
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    function saveInstalledApps() {
-      const installedApps = {};
-      appList.forEach(app => {
-        installedApps[app.name] = app.installed;
-      });
-      localStorage.setItem('installedApps', JSON.stringify(installedApps));
-    }
-
-    function renderDesktopIcons() {
-      const desktop = document.querySelector('.desktop');
-      desktop.innerHTML = '';
-      appList.filter(app => app.installed).forEach(app => {
-        const iconDiv = document.createElement('div');
-        iconDiv.classList.add('icon');
-        iconDiv.ondblclick = () => openApp(app.name.toLowerCase());
-        iconDiv.addEventListener('contextmenu', function(e) {
-          e.preventDefault();
-          if (!app.preinstalled) {
-            showContextMenu(e.pageX, e.pageY, app);
-          }
-        });
-        const img = document.createElement('img');
-        img.src = app.icon;
-        img.alt = app.name;
-        const label = document.createElement('div');
-        label.textContent = app.name;
-        iconDiv.appendChild(img);
-        iconDiv.appendChild(label);
-        desktop.appendChild(iconDiv);
-      });
-    }
-
-    function renderTaskbarIcons() {
-      const taskbar = document.querySelector('.taskbar');
-      while (taskbar.children.length > 1) {
-        taskbar.removeChild(taskbar.lastChild);
-      }
-      appList.filter(app => app.installed).forEach(app => {
-        const img = document.createElement('img');
-        img.src = app.icon;
-        img.alt = app.name;
-        img.title = app.name;
-        img.ondblclick = () => openApp(app.name.toLowerCase());
-        img.addEventListener('contextmenu', function(e) {
-          e.preventDefault();
-          if (!app.preinstalled) {
-            showContextMenu(e.pageX, e.pageY, app);
-          }
-        });
-        taskbar.appendChild(img);
-      });
-    }
-
-    function openApp(appId) {
-      const app = appList.find(a => a.name.toLowerCase() === appId);
-      if (!app) return;
-      let appWindow = document.getElementById(appId);
-      if (!appWindow) {
-        appWindow = createAppWindow(app);
-      } else {
-        appWindow.style.display = 'block';
-        if (app.name.toLowerCase() === 'app store') {
-          renderAppStoreList();
+    // Battery Status
+    if (navigator.getBattery) {
+      navigator.getBattery().then(battery => {
+        function updateBattery() {
+          const percent = Math.round(battery.level * 100);
+          document.getElementById("battery-status").textContent = battery.charging ? `⚡${percent}%` : `🔋${percent}%`;
         }
-      }
-    }
-
-    function createAppWindow(app) {
-      const windowDiv = document.createElement('div');
-      windowDiv.classList.add('window');
-      windowDiv.id = app.name.toLowerCase();
-      windowDiv.style.display = 'block';
-      const titleBar = document.createElement('div');
-      titleBar.classList.add('title-bar');
-      titleBar.textContent = app.name;
-      const closeButton = document.createElement('button');
-      closeButton.textContent = 'X';
-      closeButton.onclick = () => { windowDiv.style.display = 'none'; };
-      titleBar.appendChild(closeButton);
-      const contentDiv = document.createElement('div');
-      contentDiv.classList.add('content');
-      if (app.name.toLowerCase() === 'settings') {
-        contentDiv.innerHTML = `
-          <h3>Change Background</h3>
-          <input type="text" id="bg-url" placeholder="Enter image URL">
-          <button onclick="changeBackground()">Apply</button>`;
-      } else if (app.name.toLowerCase() === 'app store') {
-        contentDiv.innerHTML = `<h3>App Store</h3><div id="app-store-list"></div>`;
-        setTimeout(renderAppStoreList, 0);
-      } else {
-        const iframe = document.createElement('iframe');
-        iframe.src = app.content;
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.border = "none";
-        contentDiv.appendChild(iframe);
-      }
-      const resizeHandle = document.createElement('div');
-      resizeHandle.classList.add('resize-handle');
-      windowDiv.appendChild(titleBar);
-      windowDiv.appendChild(contentDiv);
-      windowDiv.appendChild(resizeHandle);
-      document.body.appendChild(windowDiv);
-      return windowDiv;
-    }
-
-    // Start menu logic
-    const startButton = document.getElementById('start-button');
-    const startMenu = document.getElementById('start-menu');
-    startButton.onclick = () => {
-      startMenu.style.display = startMenu.style.display === 'flex' ? 'none' : 'flex';
-      renderStartMenu();
-    };
-    document.addEventListener('click', (e) => {
-      if (!startMenu.contains(e.target) && e.target !== startButton) {
-        startMenu.style.display = 'none';
-      }
-    });
-
-    function renderStartMenu() {
-      startMenu.innerHTML = '';
-      appList.filter(app => app.installed).forEach(app => {
-        const appEntry = document.createElement('div');
-        appEntry.textContent = app.name;
-        appEntry.onclick = () => {
-          openApp(app.name.toLowerCase());
-          startMenu.style.display = 'none';
-        };
-        startMenu.appendChild(appEntry);
+        updateBattery();
+        battery.addEventListener("levelchange", updateBattery);
+        battery.addEventListener("chargingchange", updateBattery);
       });
     }
 
-    // Initialize
-    loadInstalledApps();
-    renderDesktopIcons();
-    renderTaskbarIcons();
+    // Rectangle Selection
+    const desktop = document.querySelector('.desktop');
+    const selectionBox = document.getElementById('selection-box');
+    let startX, startY;
+
+    desktop.addEventListener('mousedown', (e) => {
+      if (e.target !== desktop) return;
+      startX = e.pageX;
+      startY = e.pageY;
+      selectionBox.style.left = `${startX}px`;
+      selectionBox.style.top = `${startY}px`;
+      selectionBox.style.width = '0px';
+      selectionBox.style.height = '0px';
+      selectionBox.style.display = 'block';
+
+      function onMouseMove(e) {
+        const currentX = e.pageX;
+        const currentY = e.pageY;
+        const rect = {
+          x: Math.min(startX, currentX),
+          y: Math.min(startY, currentY),
+          width: Math.abs(currentX - startX),
+          height: Math.abs(currentY - startY),
+        };
+        selectionBox.style.left = `${rect.x}px`;
+        selectionBox.style.top = `${rect.y}px`;
+        selectionBox.style.width = `${rect.width}px`;
+        selectionBox.style.height = `${rect.height}px`;
+      }
+
+      function onMouseUp() {
+        selectionBox.style.display = 'none';
+        desktop.removeEventListener('mousemove', onMouseMove);
+        desktop.removeEventListener('mouseup', onMouseUp);
+      }
+
+      desktop.addEventListener('mousemove', onMouseMove);
+      desktop.addEventListener('mouseup', onMouseUp);
+    });
   </script>
 </body>
 </html>

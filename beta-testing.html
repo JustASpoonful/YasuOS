@@ -14,7 +14,6 @@
       font-family: "Segoe UI", sans-serif;
       overflow: hidden;
     }
-    /* Taskbar */
     .taskbar {
       position: fixed;
       bottom: 0;
@@ -26,6 +25,7 @@
       align-items: center;
       padding: 0 10px;
       box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.5);
+      z-index: 9999;
     }
     .taskbar img {
       width: 30px;
@@ -33,7 +33,6 @@
       cursor: pointer;
       margin-right: 10px;
     }
-    /* Desktop Icons */
     .desktop {
       position: absolute;
       top: 20px;
@@ -43,7 +42,6 @@
       flex-wrap: wrap;
       gap: 10px;
       height: calc(100% - 40px);
-      user-select: none;
     }
     .icon {
       text-align: center;
@@ -55,20 +53,6 @@
       width: 50px;
       height: 50px;
     }
-    /* Selected Icons */
-    .icon.selected {
-      background: rgba(0, 123, 255, 0.3);
-      border-radius: 4px;
-    }
-    /* Selection Rectangle */
-    .selection-rectangle {
-      position: absolute;
-      border: 1px dashed #007bff;
-      background: rgba(0, 123, 255, 0.1);
-      pointer-events: none;
-      z-index: 9999;
-    }
-    /* Windows */
     .window {
       position: absolute;
       width: 800px;
@@ -79,6 +63,7 @@
       display: none;
       top: 100px;
       left: 100px;
+      z-index: 9998;
     }
     .window .title-bar {
       background: #0078D7;
@@ -116,7 +101,6 @@
       right: 0;
       cursor: nwse-resize;
     }
-    /* Custom Context Menu */
     #custom-context-menu {
       position: absolute;
       display: none;
@@ -133,6 +117,29 @@
     #custom-context-menu div:hover {
       background: #eee;
     }
+
+    /* Start Menu */
+    #start-menu {
+      position: fixed;
+      bottom: 40px;
+      left: 10px;
+      width: 200px;
+      background: rgba(40, 40, 40, 0.95);
+      color: white;
+      border: 1px solid #444;
+      display: none;
+      flex-direction: column;
+      z-index: 9999;
+      box-shadow: 0px 0px 8px rgba(0,0,0,0.6);
+    }
+    #start-menu div {
+      padding: 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #555;
+    }
+    #start-menu div:hover {
+      background-color: #0078D7;
+    }
   </style>
 </head>
 <body>
@@ -140,77 +147,20 @@
   <div class="desktop"></div>
 
   <div class="taskbar">
-    <img src="https://www.freeiconspng.com/thumbs/windows-7-icon/windows-7-icon-14.png" alt="Start Menu" onclick="alert('Start Menu not implemented yet!')" />
+    <img src="https://www.freeiconspng.com/thumbs/windows-7-icon/windows-7-icon-14.png" alt="Start Menu" id="start-button" />
   </div>
-  
+
+  <div id="start-menu"></div>
+
   <!-- Custom Context Menu -->
   <div id="custom-context-menu">
     <div id="delete-option">Delete</div>
   </div>
 
-  <!-- Include external file that defines appList -->
+  <!-- External apps.js -->
   <script src="apps.js"></script>
 
   <script>
-    // Rectangle selection functionality
-    let selectionRect = null;
-    let startX = 0;
-    let startY = 0;
-    const desktopEl = document.querySelector('.desktop');
-
-    desktopEl.addEventListener('mousedown', (e) => {
-      if (e.button !== 0) return;
-      e.preventDefault();
-      clearSelection();
-      startX = e.pageX;
-      startY = e.pageY;
-      selectionRect = document.createElement('div');
-      selectionRect.className = 'selection-rectangle';
-      selectionRect.style.left = `${startX}px`;
-      selectionRect.style.top = `${startY}px`;
-      document.body.appendChild(selectionRect);
-
-      document.addEventListener('mousemove', onMouseMove);
-      document.addEventListener('mouseup', onMouseUp);
-    });
-
-    function onMouseMove(e) {
-      if (!selectionRect) return;
-      const curX = e.pageX;
-      const curY = e.pageY;
-      const x = Math.min(curX, startX);
-      const y = Math.min(curY, startY);
-      const w = Math.abs(curX - startX);
-      const h = Math.abs(curY - startY);
-      selectionRect.style.left = `${x}px`;
-      selectionRect.style.top = `${y}px`;
-      selectionRect.style.width = `${w}px`;
-      selectionRect.style.height = `${h}px`;
-      updateSelection(x, y, w, h);
-    }
-
-    function onMouseUp() {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseup', onMouseUp);
-      if (selectionRect) {
-        selectionRect.remove();
-        selectionRect = null;
-      }
-    }
-
-    function updateSelection(x, y, w, h) {
-      document.querySelectorAll('.icon').forEach(icon => {
-        const rect = icon.getBoundingClientRect();
-        const overlap = !(rect.right < x || rect.left > x + w || rect.bottom < y || rect.top > y + h);
-        icon.classList.toggle('selected', overlap);
-      });
-    }
-
-    function clearSelection() {
-      document.querySelectorAll('.icon.selected').forEach(icon => icon.classList.remove('selected'));
-    }
-
-    // Load installed states from localStorage.
     function loadInstalledApps() {
       const saved = localStorage.getItem('installedApps');
       if (saved) {
@@ -223,7 +173,6 @@
       }
     }
 
-    // Save installed states to localStorage.
     function saveInstalledApps() {
       const installedApps = {};
       appList.forEach(app => {
@@ -232,7 +181,6 @@
       localStorage.setItem('installedApps', JSON.stringify(installedApps));
     }
 
-    // Render desktop icons only for installed apps.
     function renderDesktopIcons() {
       const desktop = document.querySelector('.desktop');
       desktop.innerHTML = '';
@@ -257,10 +205,11 @@
       });
     }
 
-    // Render taskbar icons only for installed apps.
     function renderTaskbarIcons() {
       const taskbar = document.querySelector('.taskbar');
-      while (taskbar.children.length > 1) taskbar.removeChild(taskbar.lastChild);
+      while (taskbar.children.length > 1) {
+        taskbar.removeChild(taskbar.lastChild);
+      }
       appList.filter(app => app.installed).forEach(app => {
         const img = document.createElement('img');
         img.src = app.icon;
@@ -269,14 +218,97 @@
         img.ondblclick = () => openApp(app.name.toLowerCase());
         img.addEventListener('contextmenu', function(e) {
           e.preventDefault();
-          if (!app.preinstalled) showContextMenu(e.pageX, e.pageY, app);
+          if (!app.preinstalled) {
+            showContextMenu(e.pageX, e.pageY, app);
+          }
         });
         taskbar.appendChild(img);
       });
     }
 
-    // (Rest of original script unchanged)...
-    // Open, create windows, draggable/resizable, changeBackground, renderAppStoreList, context menu logic...
+    function openApp(appId) {
+      const app = appList.find(a => a.name.toLowerCase() === appId);
+      if (!app) return;
+      let appWindow = document.getElementById(appId);
+      if (!appWindow) {
+        appWindow = createAppWindow(app);
+      } else {
+        appWindow.style.display = 'block';
+        if (app.name.toLowerCase() === 'app store') {
+          renderAppStoreList();
+        }
+      }
+    }
+
+    function createAppWindow(app) {
+      const windowDiv = document.createElement('div');
+      windowDiv.classList.add('window');
+      windowDiv.id = app.name.toLowerCase();
+      windowDiv.style.display = 'block';
+      const titleBar = document.createElement('div');
+      titleBar.classList.add('title-bar');
+      titleBar.textContent = app.name;
+      const closeButton = document.createElement('button');
+      closeButton.textContent = 'X';
+      closeButton.onclick = () => { windowDiv.style.display = 'none'; };
+      titleBar.appendChild(closeButton);
+      const contentDiv = document.createElement('div');
+      contentDiv.classList.add('content');
+      if (app.name.toLowerCase() === 'settings') {
+        contentDiv.innerHTML = `
+          <h3>Change Background</h3>
+          <input type="text" id="bg-url" placeholder="Enter image URL">
+          <button onclick="changeBackground()">Apply</button>`;
+      } else if (app.name.toLowerCase() === 'app store') {
+        contentDiv.innerHTML = `<h3>App Store</h3><div id="app-store-list"></div>`;
+        setTimeout(renderAppStoreList, 0);
+      } else {
+        const iframe = document.createElement('iframe');
+        iframe.src = app.content;
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        contentDiv.appendChild(iframe);
+      }
+      const resizeHandle = document.createElement('div');
+      resizeHandle.classList.add('resize-handle');
+      windowDiv.appendChild(titleBar);
+      windowDiv.appendChild(contentDiv);
+      windowDiv.appendChild(resizeHandle);
+      document.body.appendChild(windowDiv);
+      return windowDiv;
+    }
+
+    // Start menu logic
+    const startButton = document.getElementById('start-button');
+    const startMenu = document.getElementById('start-menu');
+    startButton.onclick = () => {
+      startMenu.style.display = startMenu.style.display === 'flex' ? 'none' : 'flex';
+      renderStartMenu();
+    };
+    document.addEventListener('click', (e) => {
+      if (!startMenu.contains(e.target) && e.target !== startButton) {
+        startMenu.style.display = 'none';
+      }
+    });
+
+    function renderStartMenu() {
+      startMenu.innerHTML = '';
+      appList.filter(app => app.installed).forEach(app => {
+        const appEntry = document.createElement('div');
+        appEntry.textContent = app.name;
+        appEntry.onclick = () => {
+          openApp(app.name.toLowerCase());
+          startMenu.style.display = 'none';
+        };
+        startMenu.appendChild(appEntry);
+      });
+    }
+
+    // Initialize
+    loadInstalledApps();
+    renderDesktopIcons();
+    renderTaskbarIcons();
   </script>
 </body>
 </html>

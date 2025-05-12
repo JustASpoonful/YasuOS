@@ -1,114 +1,153 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maxwell XCEL</title>
-    <link rel="icon" type="image/x-icon" href="Win7Xcel.png">
-    <style>
-        
-        html,
-        body {
-            background-color: black;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maxwell XCEL OS</title>
+  <link rel="icon" type="image/x-icon" href="Win7Xcel.png">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    /* Reset & Base Styles */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      background: linear-gradient(135deg, #0e0e0e, #1a1a1a);
+      font-family: 'Roboto', sans-serif;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
 
-        .text {
-            color: white;
-            margin-left: auto;
-            margin-right: auto;
-            text-align: center;
-            margin-top: 250px;
-        }
+    /* Card Container */
+    .card {
+      background: rgba(20, 20, 20, 0.6);
+      backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      animation: fadeIn 1s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
 
-        .button {
-            text-align: center;
-            margin-top: 50px;
-        }
+    /* Content */
+    .container {
+      text-align: center;
+    }
+    .container h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      color: #fff;
+      animation: glowText 2s ease-in-out infinite alternate;
+    }
+    @keyframes glowText {
+      from { text-shadow: 0 0 10px #66aaff; }
+      to   { text-shadow: 0 0 20px #b300ff; }
+    }
+    .container p {
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    a {
+      color: #66aaff;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    a:hover { text-decoration: underline; }
 
-        .glow-on-hover {
-            width: 220px;
-            height: 50px;
-            border: none;
-            outline: none;
-            color: #fff;
-            background: #111;
-            cursor: pointer;
-            position: relative;
-            z-index: 0;
-            border-radius: 10px;
-        }
+    /* Button Layout */
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
 
-        .glow-on-hover:before {
-            content: '';
-            background: linear-gradient(45deg, #0000ff, #7a00ff, #b300ff, #d200ff, #ff00e4, #ff00c8, #ff008c, #ff0050, #0000ff);
-            position: absolute;
-            top: -2px;
-            left: -2px;
-            background-size: 400%;
-            z-index: -1;
-            filter: blur(5px);
-            width: calc(100% + 4px);
-            height: calc(100% + 4px);
-            animation: glowing 20s linear infinite;
-            opacity: 1; /* Set default opacity to 1 */
-            transition: opacity .3s ease-in-out;
-            border-radius: 10px;
-        }
+    /* Original Button Styles */
+    .glow-on-hover {
+      width: 200px;
+      height: 50px;
+      border: none;
+      outline: none;
+      color: #fff;
+      background: #111;
+      cursor: pointer;
+      position: relative;
+      border-radius: 10px;
+    }
+    .glow-on-hover:before {
+      content: '';
+      background: linear-gradient(45deg, #0000ff, #7a00ff, #b300ff, #d200ff, #ff00e4, #ff00c8, #ff008c, #ff0050, #0000ff);
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      background-size: 400%;
+      z-index: -1;
+      filter: blur(5px);
+      width: calc(100% + 4px);
+      height: calc(100% + 4px);
+      animation: glowing 20s linear infinite;
+      transition: opacity .3s ease-in-out;
+      border-radius: 10px;
+    }
+    .glow-on-hover:after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: #111;
+      left: 0;
+      top: 0;
+      border-radius: 10px;
+      z-index: -1;
+    }
+    .glow-on-hover:active { color: #000; }
+    .glow-on-hover:active:after { background: transparent; }
+    @keyframes glowing {
+      0% { background-position: 0 0; }
+      50% { background-position: 400% 0; }
+      100% { background-position: 0 0; }
+    }
 
-        .glow-on-hover:active {
-            color: #000
-        }
-
-        .glow-on-hover:active:after {
-            background: transparent;
-        }
-
-        .glow-on-hover:after {
-            z-index: -1;
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: #111;
-            left: 0;
-            top: 0;
-            border-radius: 10px;
-        }
-
-        @keyframes glowing {
-            0% { background-position: 0 0; }
-            50% { background-position: 400% 0; }
-            100% { background-position: 0 0; }
-        }
-        
-        
-    </style>
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1rem 0 0.5rem;
+      font-size: 0.85rem;
+      color: #888;
+    }
+  </style>
 </head>
 <body>
-    <div class="text">
-      <title>Maxwell XCEL OS</title> 
-      <p>You will be put in fullscreen. Still in Beta! Features are limited currently</p>
-      <p>By pressing continue you agree to the Terms of Use</p>
-      <a href="terms-of-use">
-          <div>Terms of Use</div>
-      </a>
-    </div>
+  <div class="card">
+    <div class="container">
+      <h1>Maxwell XCEL OS 4</h1>
+      <p>Bored of the old chromebook interface aswell as features? This operating system you can run in your browser will soon fix that!</p>
+      <p>By continuing, you agree to our <a href="terms-of-use">Terms of Use</a>.</p>
 
-    
-       <div class="button">
-        <form>
-            <button class="glow-on-hover" formaction="bootup">Continue</button>
+      <div class="button-group">
+        <form action="bootup">
+          <button type="submit" class="glow-on-hover">Continue</button>
         </form>
-       </div>
-       <br>
-       <p>There is also a Beta Testing area where you can test upcoming features!</p>
-        <div class="button">
-        <form>
-            <button class="glow-on-hover" formaction="beta-testing">Continue to Beta</button>
+        <form action="beta-testing">
+          <button type="submit" class="glow-on-hover">Continue to Beta Testing
+          </button>
         </form>
-       </div>
-        <h3>Whats new?</h3>
-        <p>I will be releasing a new 'Labs' app where you can test out cool demos.</p>
-    
-   </body>
+      </div>
+
+      <section>
+        <h2>What's New?</h2>
+        <p>Coming soon: <strong>Labs</strong>—an interactive sandbox for trying out experimental demos and features before they're officially released.</p>
+      </section>
+    </div>
+    <footer>
+      <span>Maxwell XCEL OS &bull; Version 0.0.2-beta</span>
+    </footer>
+  </div>
+</body>
 </html>

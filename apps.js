@@ -65,7 +65,7 @@ const appList = [
     description: "Be able to talk to your friends, this is just minified discord. This will become a full version of discord in the future!"
   },
   {
-    name: "Clock Application",
+    name: "Clock",
     icon: "https://www.freeiconspng.com/thumbs/clock-png/clock-png-5.png",
     content: "app/clockapp.html",
     installed: false,

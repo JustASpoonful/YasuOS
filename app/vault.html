@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: sans-serif; background: #f4f4f8; color: #333; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    #container { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 360px; max-width: 90%; }
+    h1 { font-size: 1.5rem; margin-bottom: 1rem; text-align: center; }
+    .section { display: none; }
+    .section.active { display: block; }
+    input[type="password"], input[type="text"], textarea { width: 100%; padding: .5rem; margin: .5rem 0 1rem 0; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { width: 100%; padding: .75rem; margin-top: .5rem; border: none; border-radius: 4px; background: #5566ff; color: white; font-size: 1rem; cursor: pointer; }
+    button:hover { background: #4455dd; }
+    .entry { padding: .5rem; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .entry:last-child { border-bottom: none; }
+    .entry button { width: auto; padding: .25rem .5rem; font-size: .8rem; background: #ff5555; }
+    #logout { background: #999; margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <h1>🔒 Secure Vault</h1>
+
+    <!-- Create PIN -->
+    <div id="create-pin" class="section">
+      <p>Set a new PIN to secure your vault:</p>
+      <input id="pin-create" type="password" placeholder="Enter PIN (4+ digits)" />
+      <input id="pin-create-confirm" type="password" placeholder="Confirm PIN" />
+      <button id="btn-create">Create PIN</button>
+    </div>
+
+    <!-- Unlock PIN -->
+    <div id="unlock-pin" class="section">
+      <p>Enter your vault PIN:</p>
+      <input id="pin-unlock" type="password" placeholder="PIN" />
+      <button id="btn-unlock">Unlock</button>
+    </div>
+
+    <!-- Vault UI -->
+    <div id="vault-ui" class="section">
+      <button id="logout">Lock Vault</button>
+
+      <h2>Add Note</h2>
+      <textarea id="note-text" rows="3" placeholder="Type a note…"></textarea>
+      <button id="save-note">Save Note</button>
+
+      <h2>Upload File</h2>
+      <input id="file-input" type="file" />
+      <button id="save-file">Save File</button>
+
+      <h2>Saved Items</h2>
+      <div id="entries"></div>
+    </div>
+  </div>
+
+  <script>
+  // ---------- Crypto helpers ----------
+  async function deriveKey(pin, salt, usage) {
+    const enc = new TextEncoder();
+    const baseKey = await crypto.subtle.importKey(
+      'raw', enc.encode(pin), 'PBKDF2', false, ['deriveKey']
+    );
+    return crypto.subtle.deriveKey({
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 150000,
+      hash: 'SHA-256'
+    }, baseKey, { name: 'AES-GCM', length: 256 }, false, usage);
+  }
+
+  function bufToB64(buf) {
+    return btoa(String.fromCharCode(...new Uint8Array(buf)));
+  }
+  function b64ToBuf(str) {
+    const bytes = atob(str).split('').map(c=>c.charCodeAt(0));
+    return new Uint8Array(bytes).buffer;
+  }
+
+  async function encryptData(key, obj) {
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const data = new TextEncoder().encode(JSON.stringify(obj));
+    const ct = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv }, key, data
+    );
+    return { iv: bufToB64(iv), data: bufToB64(ct) };
+  }
+
+  async function decryptData(key, encrypted) {
+    const iv = new Uint8Array(atob(encrypted.iv).split('').map(c=>c.charCodeAt(0)));
+    const ct = b64ToBuf(encrypted.data);
+    const pt = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv }, key, ct
+    );
+    return JSON.parse(new TextDecoder().decode(pt));
+  }
+
+  // ---------- Storage keys ----------
+  const PIN_KEY = 'vault_pin';       // b64 salt + b64 wrappedKey? We'll store salt; key derived each time
+  const SALT_KEY = 'vault_salt';
+  const DATA_KEY = 'vault_data';
+
+  // ---------- UI refs ----------
+  const createSection = id => document.getElementById(id).classList;
+  const show = id => { createSection(id).add('active'); };
+  const hide = id => { createSection(id).remove('active'); };
+
+  // ---------- Bootstrapping ----------
+  (async function init() {
+    if (!localStorage.getItem(PIN_KEY)) {
+      show('create-pin');
+    } else {
+      show('unlock-pin');
+    }
+  })();
+
+  // ---------- PIN Creation ----------
+  document.getElementById('btn-create').onclick = async () => {
+    const p1 = document.getElementById('pin-create').value;
+    const p2 = document.getElementById('pin-create-confirm').value;
+    if (p1.length < 4 || p1 !== p2) return alert('PINs must match and be ≥4 digits');
+    // generate salt
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    localStorage.setItem(SALT_KEY, bufToB64(salt));
+    // store just a placeholder to mark PIN exists (we derive actual key each time)
+    localStorage.setItem(PIN_KEY, 'set');
+    // create empty vault
+    const key = await deriveKey(p1, salt, ['encrypt','decrypt']);
+    const enc = await encryptData(key, { entries: [] });
+    localStorage.setItem(DATA_KEY, JSON.stringify(enc));
+    alert('PIN set! Please unlock.');
+    location.reload();
+  };
+
+  // ---------- Unlock ----------
+  document.getElementById('btn-unlock').onclick = async () => {
+    const pin = document.getElementById('pin-unlock').value;
+    const salt = b64ToBuf(localStorage.getItem(SALT_KEY));
+    try {
+      const key = await deriveKey(pin, salt, ['encrypt','decrypt']);
+      const enc = JSON.parse(localStorage.getItem(DATA_KEY));
+      window.vault = await decryptData(key, enc);
+      window.vault.key = key;
+      showVault();
+    } catch {
+      alert('Invalid PIN');
+    }
+  };
+
+  function showVault() {
+    hide('create-pin'); hide('unlock-pin');
+    show('vault-ui');
+    renderEntries();
+  }
+
+  // ---------- Lock / Logout ----------
+  document.getElementById('logout').onclick = () => location.reload();
+
+  // ---------- Save Note ----------
+  document.getElementById('save-note').onclick = async () => {
+    const txt = document.getElementById('note-text').value.trim();
+    if (!txt) return;
+    const id = Date.now().toString();
+    window.vault.entries.push({ id, type:'text', content: txt, time: id });
+    document.getElementById('note-text').value = '';
+    await persistVault();
+    renderEntries();
+  };
+
+  // ---------- Save File ----------
+  document.getElementById('save-file').onclick = () => {
+    const fileInput = document.getElementById('file-input');
+    if (!fileInput.files.length) return alert('Select a file');
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const id = Date.now().toString();
+      window.vault.entries.push({
+        id, type:'file',
+        name: file.name,
+        dataURL: reader.result,
+        time: id
+      });
+      fileInput.value = '';
+      await persistVault();
+      renderEntries();
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // ---------- Persist Encrypted ----------
+  async function persistVault() {
+    const encrypted = await encryptData(window.vault.key, { entries: window.vault.entries });
+    localStorage.setItem(DATA_KEY, JSON.stringify(encrypted));
+  }
+
+  // ---------- Render List ----------
+  function renderEntries() {
+    const container = document.getElementById('entries');
+    container.innerHTML = '';
+    window.vault.entries
+      .sort((a,b)=>b.time - a.time)
+      .forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'entry';
+        const left = document.createElement('span');
+        if (e.type === 'text') {
+          left.textContent = `📝 ${e.content.slice(0,30)}${e.content.length>30?'…':''}`;
+        } else {
+          left.innerHTML = `📁 <a href="${e.dataURL}" download="${e.name}">${e.name}</a>`;
+        }
+        const btn = document.createElement('button');
+        btn.textContent = 'Delete';
+        btn.onclick = async () => {
+          if (!confirm('Delete this item?')) return;
+          window.vault.entries = window.vault.entries.filter(x=>x.id!==e.id);
+          await persistVault();
+          renderEntries();
+        };
+        div.append(left, btn);
+        container.appendChild(div);
+      });
+  }
+  </script>
+</body>
+</html>

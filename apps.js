@@ -17,7 +17,7 @@ const appList = [
     description: "Adjust your system settings."
   },
   {
-    name: "ChatGPT",
+    name: "Deepcel AI",
     icon: "https://img.icons8.com/?size=512&id=u9JE2GppVZoD&format=png",
     content: "app/chatgpt.html",
     installed: false,

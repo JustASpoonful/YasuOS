@@ -80,4 +80,12 @@ const appList = [
     preinstalled: false,
     description: "This is the most secure digital vault! Be able to store text or even secret files you dont want others seeing! Also be able to set a passcode for the vault so noone can just open it up!"
   }
+  {
+    name: "Human or Not",
+    icon: "https://static-00.iconduck.com/assets.00/vault-icon-512x483-w9kgke5x.png",
+    content: "app/humanornot.html",
+    installed: false,
+    preinstalled: false,
+    description: "Figure out whether the person you are talking to is human or not."
+  }
 ];

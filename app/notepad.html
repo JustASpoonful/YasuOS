@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Notepad++</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+    #menu {
+      background: #2c2c2c;
+      color: white;
+      padding: 8px;
+      display: flex;
+      gap: 10px;
+    }
+    #menu button, #menu select {
+      background: #444;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+    #tabs {
+      background: #1e1e1e;
+      color: white;
+      display: flex;
+      border-bottom: 1px solid #555;
+    }
+    .tab {
+      padding: 8px 15px;
+      cursor: pointer;
+    }
+    .tab.active {
+      background: #333;
+    }
+    #container {
+      width: 100%;
+      height: calc(100% - 82px);
+    }
+  </style>
+</head>
+<body>
+  <div id="menu">
+    <button onclick="newTab('html')">New HTML</button>
+    <button onclick="newTab('css')">New CSS</button>
+    <button onclick="newTab('javascript')">New JS</button>
+    <button onclick="saveFile()">Save</button>
+    <select onchange="changeTheme(this.value)">
+      <option value="vs-dark">Dark</option>
+      <option value="vs-light">Light</option>
+    </select>
+  </div>
+  <div id="tabs"></div>
+  <div id="container"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+  <script>
+    let editors = {};
+    let currentTab = '';
+    let tabCounter = 0;
+
+    function newTab(language) {
+      const tabId = 'tab' + (++tabCounter);
+      const tab = document.createElement('div');
+      tab.className = 'tab';
+      tab.textContent = language.toUpperCase() + ' ' + tabCounter;
+      tab.dataset.id = tabId;
+      tab.onclick = () => switchTab(tabId);
+      document.getElementById('tabs').appendChild(tab);
+
+      const model = monaco.editor.createModel('', language);
+      const editor = monaco.editor.create(document.getElementById('container'), {
+        model: model,
+        language: language,
+        automaticLayout: true,
+        theme: 'vs-dark',
+        lineNumbers: "on",
+        tabSize: 2
+      });
+
+      if (currentTab) editors[currentTab].getContainerDomNode().style.display = 'none';
+
+      editors[tabId] = editor;
+      currentTab = tabId;
+      tab.classList.add('active');
+    }
+
+    function switchTab(tabId) {
+      if (tabId === currentTab) return;
+      editors[currentTab].getContainerDomNode().style.display = 'none';
+      document.querySelector(`.tab[data-id="${currentTab}"]`).classList.remove('active');
+
+      currentTab = tabId;
+      editors[currentTab].getContainerDomNode().style.display = 'block';
+      document.querySelector(`.tab[data-id="${currentTab}"]`).classList.add('active');
+      editors[currentTab].layout();
+    }
+
+    function saveFile() {
+      if (!currentTab) return;
+      const editor = editors[currentTab];
+      const text = editor.getValue();
+      const lang = editor.getModel().getLanguageId();
+      const blob = new Blob([text], { type: 'text/plain' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'file.' + (lang === 'javascript' ? 'js' : lang === 'css' ? 'css' : 'html');
+      a.click();
+    }
+
+    function changeTheme(theme) {
+      monaco.editor.setTheme(theme);
+    }
+
+    require.config({ paths: { vs: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' } });
+    window.MonacoEnvironment = {
+      getWorkerUrl: function (_, label) {
+        return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+          self.MonacoEnvironment = { baseUrl: 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/' };
+          importScripts('https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/base/worker/workerMain.min.js');
+        `)}`;
+      }
+    };
+
+    require(["vs/editor/editor.main"], function () {
+      newTab('html');
+    });
+  </script>
+</body>
+</html>

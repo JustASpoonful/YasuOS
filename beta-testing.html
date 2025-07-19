@@ -12,101 +12,69 @@
       padding: 0;
       background: url('https://platform.theverge.com/wp-content/uploads/sites/2/chorus/uploads/chorus_asset/file/22661975/img24.jpg?quality=90&strip=all') no-repeat center center fixed;
       background-size: cover;
-      font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+      font-family: "Segoe UI", sans-serif;
       overflow: hidden;
     }
 
-    /* ----- GLASSMORPHISM MIXIN (no borders) ----- */
-    .glass {
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-      border-radius: 12px;
-    }
-
-    /* ----- SETUP PAGE ----- */
-    .setup-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100000;
-      background: rgba(0, 0, 0, 0.4);
-    }
-    .setup-panel {
-      width: 320px;
-      padding: 24px;
-      text-align: center;
-    }
-    .setup-panel h2 {
-      margin-bottom: 12px;
-      color: #fff;
-      font-weight: 500;
-    }
-    .setup-panel button {
-      margin-top: 20px;
-      padding: 10px 20px;
-      cursor: pointer;
-      background: rgba(0, 0, 0, 0.1);
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      font-size: 15px;
-      backdrop-filter: blur(10px);
-    }
-
-    /* ----- TASKBAR (Dock-like) ----- */
+    /* ----- TASKBAR ----- */
     .taskbar {
       position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      height: 60px;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: rgba(20, 20, 20, 0.8);
       display: flex;
-      align-items: flex-end;
-      padding: 0 16px;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-      border-radius: 30px;
-      gap: 16px;
+      align-items: center;
+      padding: 0 10px;
+      box-shadow: 0 -3px 5px rgba(0,0,0,0.5);
+      transition: background 0.3s;
     }
     .taskbar img {
-      width: 40px;
-      height: 40px;
+      width: 30px;
+      height: 30px;
       cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .taskbar img:hover {
-      transform: scale(1.2);
+      margin-right: 10px;
     }
 
     /* ----- DESKTOP ICONS ----- */
     .desktop {
       position: absolute;
-      top: 40px;
-      left: 40px;
-      display: flex;
-      flex-direction: column;
-      flex-wrap: wrap;
-      gap: 14px;
-      height: calc(100% - 80px);
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 40px);
     }
     .icon {
+      position: absolute;
       text-align: center;
       cursor: pointer;
-      color: #fff;
-      width: 72px;
+      color: white;
+      width: 80px;
+      user-select: none;
     }
     .icon img {
-      width: 48px;
-      height: 48px;
+      width: 50px;
+      height: 50px;
+    }
+
+    /* ----- CONTEXT MENU ----- */
+    #desktop-context-menu, #custom-context-menu {
+      position: absolute;
+      display: none;
+      z-index: 10000;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      border-radius: 4px;
+      padding: 5px 0;
+      font-size: 14px;
+    }
+    #desktop-context-menu div, #custom-context-menu div {
+      padding: 6px 20px;
+      cursor: pointer;
+    }
+    #desktop-context-menu div:hover, #custom-context-menu div:hover {
+      background: #eee;
     }
 
     /* ----- WINDOWS ----- */
@@ -114,177 +82,200 @@
       position: absolute;
       width: 800px;
       height: 600px;
+      background: white;
+      border: 2px solid #ccc;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
       display: none;
       top: 100px;
       left: 100px;
-      background: rgba(255, 255, 255, 0.5);
-      backdrop-filter: blur(40px);
-      -webkit-backdrop-filter: blur(40px);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.2);
-      border-radius: 12px;
+      border-radius: 4px;
+      overflow: hidden;
+      transition: transform 0.2s, opacity 0.2s;
+      opacity: 0;
+    }
+    .window.show {
+      display: block;
+      opacity: 1;
+    }
+    .window.minimized {
+      display: none;
     }
     .window .title-bar {
-      position: relative;
-      background: rgba(255, 255, 255, 0.4);
-      backdrop-filter: blur(30px);
-      -webkit-backdrop-filter: blur(30px);
-      height: 28px;
-      padding: 0 14px;
+      background: #0078D7;
+      color: white;
+      padding: 5px;
+      cursor: move;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      border-top-left-radius: 12px;
-      border-top-right-radius: 12px;
-    }
-    /* Mac-style traffic lights */
-    .title-bar .mac-buttons {
-      display: flex;
-      gap: 8px;
-    }
-    .title-bar .mac-buttons .mac-btn {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: red;
-    }
-    .title-bar .mac-buttons .mac-btn.yellow { background: #f4c542; }
-    .title-bar .mac-buttons .mac-btn.green { background: #3ece5b; }
-    .title-bar .title {
-      flex: 1;
-      text-align: center;
-      font-size: 13px;
-      color: #333;
       user-select: none;
     }
+    .window .title-bar .controls {
+      display: flex;
+      gap: 5px;
+    }
+    .window .title-bar button {
+      background: transparent;
+      border: none;
+      color: white;
+      width: 20px;
+      height: 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
     .window .content {
-      padding: 12px;
-      height: calc(100% - 28px);
+      padding: 10px;
+      height: calc(100% - 30px);
       overflow: auto;
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
     }
     .resize-handle {
-      width: 12px;
-      height: 12px;
+      width: 10px;
+      height: 10px;
+      background: gray;
       position: absolute;
-      bottom: 8px;
-      right: 8px;
+      bottom: 0;
+      right: 0;
       cursor: nwse-resize;
-      opacity: 0.5;
     }
 
-    /* ----- CUSTOM CONTEXT MENU ----- */
-    #custom-context-menu {
-      position: absolute;
-      display: none;
-      z-index: 10000;
-      padding: 6px;
-      background: rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 8px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-    #custom-context-menu div {
-      cursor: pointer;
-      padding: 6px 12px;
-      border-radius: 4px;
-      font-size: 14px;
-    }
-    #custom-context-menu div:hover {
-      background: rgba(255,255,255,0.25);
-    }
+    /* ----- ANIMATIONS ----- */
+    @keyframes snap-left { from {transform: scale(1);} to {transform: scale(0.98);} }
+    @keyframes snap-right { from {transform: scale(1);} to {transform: scale(0.98);} }
 
-    /* ----- APP STORE CARDS ----- */
-    #app-store-list > div {
-      background: rgba(255,255,255,0.3);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    }
   </style>
 </head>
 <body>
 
-  <!-- SETUP PAGE -->
-  <div class="setup-overlay" id="setup">
-    <div class="setup-panel glass">
-      <h2>Welcome to MXCEL OS 6</h2>
-      <p>Let’s get you started!</p>
-      <button onclick="completeSetup()">Begin</button>
-    </div>
+  <div class="desktop" id="desktop"></div>
+  <div class="taskbar" id="taskbar">
+    <img src="https://img.icons8.com/ios_filled/512/FA5252/windows-10.png" alt="Start" onclick="alert('Start Menu!')" />
   </div>
 
-  <!-- DESKTOP AREA -->
-  <div class="desktop"></div>
-
-  <!-- TASKBAR -->
-  <div class="taskbar">
-    <img src="https://img.icons8.com/ios_filled/512/FA5252/windows-10.png" alt="Start Menu" onclick="alert('Start Menu not implemented yet!')" />
+  <!-- Desktop Context Menu -->
+  <div id="desktop-context-menu">
+    <div onclick="refreshDesktop()">Refresh</div>
+    <div onclick="changeBackgroundPrompt()">Change Background</div>
   </div>
-  
-  <!-- CUSTOM CONTEXT MENU -->
+
+  <!-- App Context Menu -->
   <div id="custom-context-menu">
     <div id="delete-option">Delete</div>
   </div>
 
-  <!-- APPS LIST -->
+  <audio id="open-sound" src="open.mp3"></audio>
+  <audio id="close-sound" src="close.mp3"></audio>
+  <audio id="snap-sound" src="snap.mp3"></audio>
+
   <script src="apps.js"></script>
-
   <script>
-    // SETUP LOGIC
-    function completeSetup() {
-      localStorage.setItem('setupDone', 'true');
-      document.getElementById('setup').style.display = 'none';
-    }
-    window.addEventListener('load', () => {
-      if (localStorage.getItem('setupDone') === 'true') {
-        document.getElementById('setup').style.display = 'none';
-      }
-    });
+    let taskbar = document.getElementById('taskbar');
+    let desktop = document.getElementById('desktop');
+    let desktopMenu = document.getElementById('desktop-context-menu');
 
-    // EXISTING LOGIC (unchanged)
-    function loadInstalledApps() { /* ... */ }
-    function saveInstalledApps() { /* ... */ }
-    function renderDesktopIcons() { /* ... */ }
-    function renderTaskbarIcons() { /* ... */ }
-    function openApp(id) { /* ... */ }
-    function createAppWindow(app) {
-      const w = document.createElement('div');
-      w.classList.add('window'); w.id = app.name.toLowerCase(); w.style.display='block';
-      const bar = document.createElement('div'); bar.classList.add('title-bar');
-
-      // Mac-style buttons
-      const btns = document.createElement('div'); btns.classList.add('mac-buttons');
-      ['','yellow','green'].forEach((c,i) => {
-        const b = document.createElement('div'); b.classList.add('mac-btn');
-        if(i===1) b.classList.add('yellow');
-        if(i===2) b.classList.add('green');
-        btns.appendChild(b);
+    // Build desktop icons at random positions
+    function renderDesktopIcons() {
+      desktop.innerHTML = '';
+      appList.filter(a=>a.installed).forEach((app,i)=>{
+        let div = document.createElement('div'); div.classList.add('icon');
+        div.style.left = (20 + (i%5)*100)+'px'; div.style.top = (20 + Math.floor(i/5)*100)+'px';
+        div.ondblclick = ()=>openApp(app.name.toLowerCase());
+        div.addEventListener('contextmenu', e=>{ e.preventDefault(); showAppMenu(e,app); });
+        let img = document.createElement('img'); img.src=app.icon; img.alt=app.name;
+        let lbl = document.createElement('div'); lbl.textContent = app.name;
+        div.append(img,lbl); desktop.append(div);
       });
-      bar.appendChild(btns);
-
-      const title = document.createElement('div'); title.classList.add('title'); title.textContent=app.name;
-      bar.appendChild(title);
-
-      const content = document.createElement('div'); content.classList.add('content');
-      // ... insert your content logic here ...
-      w.append(bar, content, document.createElement('div').classList.add('resize-handle') && content);
-      document.body.appendChild(w);
-      makeDraggableAndResizable(w);
-      return w;
     }
-    function makeDraggableAndResizable(w) { /* ... */ }
-    function changeBackground() { /* ... */ }
-    function renderAppStoreList() { /* ... */ }
-    function showContextMenu(x,y,app) { /* ... */ }
-    function hideContextMenu() { /* ... */ }
-    document.getElementById('delete-option').addEventListener('click', () => { /* ... */ });
-    document.addEventListener('click', hideContextMenu);
-    window.onload = () => { loadInstalledApps(); renderDesktopIcons(); renderTaskbarIcons(); };
-  </script>
 
+    function showDesktopMenu(e) {
+      e.preventDefault(); desktopMenu.style.left=`${e.pageX}px`; desktopMenu.style.top=`${e.pageY}px`; desktopMenu.style.display='block';
+    }
+    document.addEventListener('contextmenu', function(e){ if(e.target.id==='desktop') showDesktopMenu(e); });
+    document.addEventListener('click', ()=>{ desktopMenu.style.display='none'; customMenu && (customMenu.style.display='none'); });
+
+    function refreshDesktop(){ renderDesktopIcons(); desktopMenu.style.display='none'; }
+    function changeBackgroundPrompt(){ let url=prompt('Image URL'); if(url) document.body.style.background=`url('${url}') no-repeat center/cover`; desktopMenu.style.display='none'; }
+
+    // Window management
+    function createAppWindow(app) {
+      let win = document.createElement('div'); win.className='window'; win.id=app.name.toLowerCase();
+      win.innerHTML = `
+        <div class='title-bar'>
+          <span class='title'>${app.name}</span>
+          <div class='controls'>
+            <button class='min-btn'>_</button>
+            <button class='max-btn'>□</button>
+            <button class='close-btn'>×</button>
+          </div>
+        </div>
+        <div class='content'></div>
+      `;
+      document.body.append(win);
+      let audioOpen=document.getElementById('open-sound'); audioOpen.play();
+      let content = win.querySelector('.content');
+      if(app.name.toLowerCase()==='settings') content.innerHTML=`<h3>Change Background</h3><input id='bg-url'><button onclick='changeBackground()'>Apply</button>`;
+      else if(app.name.toLowerCase()==='app store'){ content.innerHTML=`<h3>App Store</h3><div id='app-store-list'></div>`; renderAppStoreList(); }
+      else{ let ifr=document.createElement('iframe'); ifr.src=app.content; ifr.style.width='100%'; ifr.style.height='100%'; ifr.style.border='none'; content.append(ifr); }
+
+      // Controls
+      win.querySelector('.close-btn').onclick = ()=>{ win.classList.remove('show'); document.getElementById('close-sound').play(); };
+      win.querySelector('.min-btn').onclick = ()=>{ win.classList.remove('show'); };
+      win.querySelector('.max-btn').onclick = ()=>{ win.style.transform='translate(0,0) scale(1)'; win.style.top='0'; win.style.left='0'; win.style.width='100%'; win.style.height='calc(100% - 40px)'; };
+
+      win.querySelector('.title-bar').addEventListener('dblclick', ()=>win.querySelector('.max-btn').onclick());
+      win.classList.add('show');
+      makeDraggableResizableSnap(win);
+    }
+
+    function openApp(id) {
+      let app = appList.find(a=>a.name.toLowerCase()===id);
+      if(!app) return;
+      if(document.getElementById(id)) document.getElementById(id).classList.add('show');
+      else createAppWindow(app);
+    }
+
+    // Drag/resize with snap
+    function makeDraggableResizableSnap(win) {
+      let isDrag=false, isResize=false, sx, sy, w0,h0,ox,oy;
+      let bar=win.querySelector('.title-bar'), rh = document.createElement('div'); rh.className='resize-handle'; win.append(rh);
+      bar.onmousedown=e=>{ isDrag=true; ox=e.clientX-win.offsetLeft; oy=e.clientY-win.offsetTop; };
+      rh.onmousedown=e=>{ isResize=true; sx=e.clientX; sy=e.clientY; w0=win.offsetWidth; h0=win.offsetHeight; e.stopPropagation(); };
+      document.onmousemove=e=>{
+        if(isDrag){ win.style.left=(e.clientX-ox)+'px'; win.style.top=(e.clientY-oy)+'px'; }
+        if(isResize){ win.style.width=(w0+(e.clientX-sx))+'px'; win.style.height=(h0+(e.clientY-sy))+'px'; }
+      };
+      document.onmouseup=e=>{
+        if(isDrag){
+          let sw=window.innerWidth;
+          if(win.offsetLeft < sw*0.1){ // left snap
+            win.style.width=sw/2+'px'; win.style.left=0; win.style.top=0; document.getElementById('snap-sound').play();
+          } else if(win.offsetLeft > sw*0.9 - win.offsetWidth){ // right snap
+            win.style.width=sw/2+'px'; win.style.left=sw/2+'px'; win.style.top=0; document.getElementById('snap-sound').play();
+          }
+        }
+        isDrag=isResize=false;
+      };
+    }
+
+    // Custom app context menu
+    let customMenu, currentApp;
+    function showAppMenu(e,app){
+      e.preventDefault();
+      customMenu = document.getElementById('custom-context-menu');
+      customMenu.style.left=e.pageX+'px'; customMenu.style.top=e.pageY+'px'; customMenu.style.display='block';
+      currentApp=app;
+    }
+    document.getElementById('delete-option').onclick = ()=>{
+      if(currentApp && !currentApp.preinstalled){ currentApp.installed=false; saveInstalledApps(); renderDesktopIcons(); renderTaskbarIcons(); renderAppStoreList(); }
+      customMenu.style.display='none';
+    };
+
+    // Original persistence & init
+    function loadInstalledApps(){ const s=localStorage.getItem('installedApps'); if(s){Object.assign(appList.reduce((o,a)=>{o[a.name]=a;return o},{}),JSON.parse(s)); }}
+    function saveInstalledApps(){ localStorage.setItem('installedApps', JSON.stringify(Object.fromEntries(appList.map(a=>[a.name,a.installed])))); }
+    function renderTaskbarIcons(){ taskbar.querySelectorAll('img:not(:first-child)').forEach(n=>n.remove()); appList.filter(a=>a.installed).forEach(a=>{ let img=new Image(); img.src=a.icon; img.title=a.name; img.ondblclick=()=>openApp(a.name.toLowerCase()); taskbar.append(img); }); }
+    function renderAppStoreList(){ /* ... same as before ... */ }
+
+    window.onload=()=>{ loadInstalledApps(); renderDesktopIcons(); renderTaskbarIcons(); if(localStorage.getItem('wallpaper')) document.body.style.background=`url('${localStorage.getItem('wallpaper')}') no-repeat center/cover`; };
+  </script>
 </body>
 </html>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MXCEL OS 6</title>
+  <title>MXCEL OS 2</title>
   <link rel="icon" type="image/x-icon" href="Win7Xcel.png">
   <style>
     /* ----- BASE STYLES ----- */
@@ -18,12 +18,43 @@
 
     /* ----- GLASSMORPHISM MIXIN ----- */
     .glass {
-      background: rgba(255, 255, 255, 0.15);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    /* ----- SETUP PAGE ----- */
+    .setup-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100000;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .setup-panel {
+      width: 300px;
+      padding: 20px;
+      text-align: center;
+    }
+    .setup-panel h2 {
+      margin-bottom: 10px;
+      color: #fff;
+    }
+    .setup-panel button {
+      margin-top: 15px;
+      padding: 8px 16px;
+      cursor: pointer;
+      border: none;
       border-radius: 4px;
+      font-size: 14px;
     }
 
     /* ----- TASKBAR ----- */
@@ -38,15 +69,21 @@
       padding: 0 10px;
       box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.5);
       background: rgba(20, 20, 20, 0.4);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
     }
     .taskbar img {
       width: 30px;
       height: 30px;
       cursor: pointer;
       margin-right: 10px;
+      /* slight glass behind icons */
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      border-radius: 4px;
+      padding: 4px;
     }
 
     /* ----- DESKTOP ICONS ----- */
@@ -79,23 +116,27 @@
       display: none;
       top: 100px;
       left: 100px;
+      /* improved glass effect */
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+    .window .title-bar {
+      /* glass tab */
       background: rgba(255, 255, 255, 0.15);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
-      border-radius: 4px;
-    }
-    .window .title-bar {
-      background: rgba(0, 120, 215, 0.8);
-      color: white;
+      color: #0078D7;
       padding: 5px;
       cursor: move;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-top-left-radius: 4px;
-      border-top-right-radius: 4px;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
     }
     .window .title-bar button {
       background: red;
@@ -151,8 +192,8 @@
     /* ----- APP STORE CARDS ----- */
     #app-store-list > div {
       background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(6px);
-      -webkit-backdrop-filter: blur(6px);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-radius: 8px;
       padding: 10px;
       margin-bottom: 10px;
@@ -161,162 +202,134 @@
 </head>
 <body>
 
+  <!-- SETUP PAGE -->
+  <div class="setup-overlay" id="setup">
+    <div class="setup-panel glass">
+      <h2>Welcome to MXCEL OS 6</h2>
+      <p>Let’s get you started!</p>
+      <button onclick="completeSetup()">Begin</button>
+    </div>
+  </div>
+
+  <!-- DESKTOP AREA -->
   <div class="desktop"></div>
 
+  <!-- TASKBAR -->
   <div class="taskbar">
     <img src="https://img.icons8.com/ios_filled/512/FA5252/windows-10.png" alt="Start Menu" onclick="alert('Start Menu not implemented yet!')" />
   </div>
   
-  <!-- Custom Context Menu -->
+  <!-- CUSTOM CONTEXT MENU -->
   <div id="custom-context-menu">
     <div id="delete-option">Delete</div>
   </div>
 
-  <!-- Include external file that defines appList -->
+  <!-- APPS LIST -->
   <script src="apps.js"></script>
 
   <script>
-    // Load installed states from localStorage.
+    // SETUP LOGIC
+    function completeSetup() {
+      localStorage.setItem('setupDone', 'true');
+      document.getElementById('setup').style.display = 'none';
+    }
+    window.addEventListener('load', () => {
+      if (localStorage.getItem('setupDone') === 'true') {
+        document.getElementById('setup').style.display = 'none';
+      }
+    });
+
+    // EXISTING LOGIC
     function loadInstalledApps() {
       const saved = localStorage.getItem('installedApps');
       if (saved) {
         const installedApps = JSON.parse(saved);
         appList.forEach(app => {
-          if (installedApps.hasOwnProperty(app.name)) {
-            app.installed = installedApps[app.name];
-          }
+          if (installedApps.hasOwnProperty(app.name)) app.installed = installedApps[app.name];
         });
       }
     }
-
-    // Save installed states to localStorage.
     function saveInstalledApps() {
-      const installedApps = {};
-      appList.forEach(app => {
-        installedApps[app.name] = app.installed;
-      });
-      localStorage.setItem('installedApps', JSON.stringify(installedApps));
+      const data = {};
+      appList.forEach(app => data[app.name] = app.installed);
+      localStorage.setItem('installedApps', JSON.stringify(data));
     }
-
-    // Render desktop icons only for installed apps.
     function renderDesktopIcons() {
-      const desktop = document.querySelector('.desktop');
-      desktop.innerHTML = '';
-      appList.filter(app => app.installed).forEach(app => {
-        const iconDiv = document.createElement('div');
-        iconDiv.classList.add('icon');
-        iconDiv.ondblclick = () => openApp(app.name.toLowerCase());
-        iconDiv.addEventListener('contextmenu', function(e) {
-          e.preventDefault();
-          if (!app.preinstalled) {
-            showContextMenu(e.pageX, e.pageY, app);
-          }
-        });
-        const img = document.createElement('img');
-        img.src = app.icon;
-        img.alt = app.name;
-        const label = document.createElement('div');
-        label.textContent = app.name;
-        iconDiv.appendChild(img);
-        iconDiv.appendChild(label);
-        desktop.appendChild(iconDiv);
+      const d = document.querySelector('.desktop'); d.innerHTML = '';
+      appList.filter(a => a.installed).forEach(app => {
+        const div = document.createElement('div'); div.classList.add('icon');
+        div.ondblclick = () => openApp(app.name.toLowerCase());
+        div.addEventListener('contextmenu', e => { e.preventDefault(); if (!app.preinstalled) showContextMenu(e.pageX, e.pageY, app); });
+        const img = document.createElement('img'); img.src = app.icon; img.alt = app.name;
+        const label = document.createElement('div'); label.textContent = app.name;
+        div.append(img, label); d.append(div);
       });
     }
-
-    // Render taskbar icons only for installed apps.
     function renderTaskbarIcons() {
-      const taskbar = document.querySelector('.taskbar');
-      while (taskbar.children.length > 1) taskbar.removeChild(taskbar.lastChild);
-      appList.filter(app => app.installed).forEach(app => {
-        const img = document.createElement('img');
-        img.src = app.icon;
-        img.alt = app.name;
-        img.title = app.name;
+      const t = document.querySelector('.taskbar'); while (t.children.length > 1) t.removeChild(t.lastChild);
+      appList.filter(a => a.installed).forEach(app => {
+        const img = document.createElement('img'); img.src = app.icon; img.alt = app.name; img.title = app.name;
         img.ondblclick = () => openApp(app.name.toLowerCase());
-        img.addEventListener('contextmenu', function(e) {
-          e.preventDefault();
-          if (!app.preinstalled) showContextMenu(e.pageX, e.pageY, app);
-        });
-        taskbar.appendChild(img);
+        img.addEventListener('contextmenu', e => { e.preventDefault(); if (!app.preinstalled) showContextMenu(e.pageX, e.pageY, app); });
+        t.append(img);
       });
     }
-
-    // Open or create app window.
-    function openApp(appId) {
-      const app = appList.find(a => a.name.toLowerCase() === appId);
-      if (!app) return console.error("App not found: " + appId);
-      let appWindow = document.getElementById(appId);
-      if (!appWindow) appWindow = createAppWindow(app);
-      else {
-        appWindow.style.display = 'block';
-        if (app.name.toLowerCase() === 'app store') renderAppStoreList();
-      }
+    function openApp(id) {
+      const app = appList.find(a => a.name.toLowerCase() === id);
+      if (!app) return;
+      let w = document.getElementById(id);
+      if (!w) w = createAppWindow(app);
+      else { w.style.display = 'block'; if (app.name.toLowerCase()==='app store') renderAppStoreList(); }
     }
-
-    // Create app window container.
     function createAppWindow(app) {
-      const win = document.createElement('div');
-      win.classList.add('window'); win.id = app.name.toLowerCase(); win.style.display='block';
-      const titleBar = document.createElement('div'); titleBar.classList.add('title-bar'); titleBar.textContent = app.name;
-      const closeBtn = document.createElement('button'); closeBtn.textContent='X'; closeBtn.onclick=() => win.style.display='none'; titleBar.appendChild(closeBtn);
-      const content = document.createElement('div'); content.classList.add('content');
-      if (app.name.toLowerCase()==='settings') content.innerHTML=`<h3>Change Background</h3><input type="text" id="bg-url" placeholder="Enter image URL (PNG, GIF, etc.)"><button onclick="changeBackground()">Apply</button>`;
-      else if (app.name.toLowerCase()==='app store'){ content.innerHTML=`<h3>App Store</h3><div id="app-store-list"></div>`; setTimeout(renderAppStoreList,0);} 
-      else { const iframe=document.createElement('iframe'); iframe.src=app.content; iframe.style.width='100%'; iframe.style.height='100%'; iframe.style.border='none'; content.appendChild(iframe); }
-      const resizeHandle=document.createElement('div'); resizeHandle.classList.add('resize-handle');
-      win.appendChild(titleBar); win.appendChild(content); win.appendChild(resizeHandle); document.body.appendChild(win);
-      makeDraggableAndResizable(win);
-      return win;
+      const w = document.createElement('div'); w.classList.add('window'); w.id = app.name.toLowerCase(); w.style.display='block';
+      const bar = document.createElement('div'); bar.classList.add('title-bar'); bar.textContent = app.name;
+      const btn = document.createElement('button'); btn.textContent='X'; btn.onclick=() => w.style.display='none'; bar.append(btn);
+      const c = document.createElement('div'); c.classList.add('content');
+      if (app.name.toLowerCase()==='settings') c.innerHTML = `<h3>Change Background</h3><input type="text" id="bg-url" placeholder="Enter image URL"><button onclick="changeBackground()">Apply</button>`;
+      else if (app.name.toLowerCase()==='app store') { c.innerHTML=`<h3>App Store</h3><div id="app-store-list"></div>`; setTimeout(renderAppStoreList,0); }
+      else { const ifr=document.createElement('iframe'); ifr.src=app.content; ifr.style.width='100%'; ifr.style.height='100%'; ifr.style.border='none'; c.append(ifr); }
+      const rh = document.createElement('div'); rh.classList.add('resize-handle');
+      w.append(bar, c, rh); document.body.append(w);
+      makeDraggableAndResizable(w);
+      return w;
     }
-
-    // Drag & resize logic.
-    function makeDraggableAndResizable(win){
-      let drag=false, resize=false, startX, startY, startW, startH, offsetX, offsetY;
-      const bar=win.querySelector('.title-bar'), handle=win.querySelector('.resize-handle');
-      bar.onmousedown=e=>{drag=true; offsetX=e.clientX-win.offsetLeft; offsetY=e.clientY-win.offsetTop;};
-      handle.onmousedown=e=>{resize=true; startX=e.clientX; startY=e.clientY; startW=win.offsetWidth; startH=win.offsetHeight; e.stopPropagation();};
-      document.addEventListener('mousemove',e=>{
-        if(drag){win.style.left=(e.clientX-offsetX)+'px'; win.style.top=(e.clientY-offsetY)+'px';}
-        if(resize){win.style.width=startW+(e.clientX-startX)+'px'; win.style.height=startH+(e.clientY-startY)+'px';}
-      });
-      document.addEventListener('mouseup',()=>{drag=resize=false;});
+    function makeDraggableAndResizable(w) {
+      let d=false, r=false, sx, sy, sw, sh, ox, oy;
+      const bar=w.querySelector('.title-bar'), rh=w.querySelector('.resize-handle');
+      bar.onmousedown=e=>{ d=true; ox=e.clientX-w.offsetLeft; oy=e.clientY-w.offsetTop; };
+      rh.onmousedown=e=>{ r=true; sx=e.clientX; sy=e.clientY; sw=w.offsetWidth; sh=w.offsetHeight; e.stopPropagation(); };
+      document.addEventListener('mousemove', e=>{ if(d){ w.style.left=(e.clientX-ox)+'px'; w.style.top=(e.clientY-oy)+'px'; } if(r){ w.style.width=sw+(e.clientX-sx)+'px'; w.style.height=sh+(e.clientY-sy)+'px'; }});
+      document.addEventListener('mouseup', ()=>{ d=r=false; });
     }
-
-    // Background changer.
-    function changeBackground(){ const url=document.getElementById('bg-url').value; if(url){localStorage.setItem('wallpaper',url); document.body.style.backgroundImage=`url('${url}')`; }}
-
-    // App Store list.
-    function renderAppStoreList(){
-      const list=document.getElementById('app-store-list'); if(!list) return; list.innerHTML='';
+    function changeBackground() { const u=document.getElementById('bg-url').value; if(u){ localStorage.setItem('wallpaper',u); document.body.style.backgroundImage=`url('${u}')`; }}
+    function renderAppStoreList() {
+      const l=document.getElementById('app-store-list'); if(!l) return; l.innerHTML='';
       const avail=appList.filter(a=>!a.installed && a.name.toLowerCase()!=='app store');
-      if(!avail.length) return list.innerHTML='<p>All apps are installed.</p>';
+      if(avail.length===0) return l.innerHTML='<p>All apps are installed.</p>';
       avail.forEach(app=>{
         const card=document.createElement('div');
         const row=document.createElement('div'); row.style.display='flex'; row.style.alignItems='center';
         const img=document.createElement('img'); img.src=app.icon; img.style.width='40px'; img.style.height='40px'; img.style.marginRight='10px';
         const name=document.createElement('span'); name.textContent=app.name; name.style.fontWeight='bold';
-        row.appendChild(img); row.appendChild(name);
+        row.append(img,name);
         const desc=document.createElement('div'); desc.textContent=app.description; desc.style.fontSize='12px'; desc.style.color='#555'; desc.style.marginTop='5px';
-        const btn=document.createElement('button'); btn.textContent='Install'; btn.style.marginTop='10px'; btn.onclick=()=>{app.installed=true; saveInstalledApps(); renderDesktopIcons(); renderTaskbarIcons(); renderAppStoreList();};
-        card.appendChild(row); card.appendChild(desc); card.appendChild(btn); list.appendChild(card);
+        const btn=document.createElement('button'); btn.textContent='Install'; btn.style.marginTop='10px'; btn.onclick=()=>{ app.installed=true; saveInstalledApps(); renderDesktopIcons(); renderTaskbarIcons(); renderAppStoreList(); };
+        card.append(row, desc, btn); l.append(card);
       });
     }
-
-    // Context menu logic.
     let currentApp=null;
-    function showContextMenu(x,y,app){currentApp=app; const m=document.getElementById('custom-context-menu'); m.style.left=x+'px'; m.style.top=y+'px'; m.style.display='block';}
-    function hideContextMenu(){const m=document.getElementById('custom-context-menu'); m.style.display='none'; currentApp=null;}
-    document.getElementById('delete-option').addEventListener('click',()=>{if(currentApp&&!currentApp.preinstalled){currentApp.installed=false; saveInstalledApps(); renderDesktopIcons(); renderTaskbarIcons(); renderAppStoreList();} hideContextMenu();});
-    document.getElementById('custom-context-menu').addEventListener('click',e=>e.stopPropagation());
-    document.addEventListener('click',hideContextMenu);
-
-    // Init on load.
-    window.onload=function(){
+    function showContextMenu(x,y,app){ currentApp=app; const m=document.getElementById('custom-context-menu'); m.style.left=x+'px'; m.style.top=y+'px'; m.style.display='block'; }
+    function hideContextMenu(){ const m=document.getElementById('custom-context-menu'); m.style.display='none'; currentApp=null; }
+    document.getElementById('delete-option').addEventListener('click', ()=>{ if(currentApp && !currentApp.preinstalled){ currentApp.installed=false; saveInstalledApps(); renderDesktopIcons(); renderTaskbarIcons(); renderAppStoreList(); } hideContextMenu(); });
+    document.getElementById('custom-context-menu').addEventListener('click', e=>e.stopPropagation());
+    document.addEventListener('click', hideContextMenu);
+    window.onload = () => {
       loadInstalledApps();
       renderDesktopIcons();
       renderTaskbarIcons();
-      const saved=localStorage.getItem('wallpaper');
-      if(saved) document.body.style.backgroundImage=`url('${saved}')`;
+      const s = localStorage.getItem('wallpaper');
+      if (s) document.body.style.backgroundImage = `url('${s}')`;
     };
   </script>
 

@@ -1,174 +1,176 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="icon" type="image/x-icon" href="Win7Xcel.png">
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Yasu OS</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     html, body {
       height: 100%;
-      background: linear-gradient(135deg, #0e0e0e, #1a1a1a);
-      font-family: 'Roboto', sans-serif;
-      color: #e0e0e0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(120deg, #0f0f0f, #1a1a1a);
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
+      overflow: hidden;
     }
 
-    .card {
-      background: rgba(20, 20, 20, 0.6);
-      backdrop-filter: blur(10px);
-      border-radius: 16px;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.7);
-      padding: 2rem;
-      max-width: 500px;
+    body::before {
+      content: '';
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle at center, #7700ff88, transparent);
+      top: -150px;
+      left: -150px;
+      z-index: 0;
+      filter: blur(150px);
+      pointer-events: none;
+    }
+
+    .glass-card {
+      position: relative;
+      z-index: 1;
       width: 90%;
-      animation: fadeIn 1s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
+      max-width: 720px;
+      padding: 3rem 2rem;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      backdrop-filter: blur(30px);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+      color: #f0f0f0;
     }
 
-    .container {
+    h1 {
+      font-size: 3rem;
+      text-align: center;
+      margin-bottom: 1rem;
+      background: linear-gradient(90deg, #66aaff, #b300ff, #ff007a);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: titlePulse 6s ease-in-out infinite;
+    }
+
+    @keyframes titlePulse {
+      0% { filter: brightness(1); }
+      50% { filter: brightness(1.5); }
+      100% { filter: brightness(1); }
+    }
+
+    p, ul {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      margin: 1rem 0;
       text-align: center;
     }
-    .container h1 {
-      font-size: 2.5rem;
-      margin-bottom: 0.5rem;
-      color: #fff;
-      animation: glowText 2s ease-in-out infinite alternate;
-    }
-    @keyframes glowText {
-      from { text-shadow: 0 0 10px #66aaff; }
-      to   { text-shadow: 0 0 20px #b300ff; }
-    }
-    .container p {
-      margin-bottom: 1rem;
-      line-height: 1.5;
-    }
+
     a {
       color: #66aaff;
       text-decoration: none;
-      font-weight: 500;
+      font-weight: 600;
     }
-    a:hover { text-decoration: underline; }
 
     .button-group {
       display: flex;
       justify-content: center;
-      gap: 1rem;
+      gap: 1.5rem;
       margin: 2rem 0;
+      flex-wrap: wrap;
     }
 
-    .glow-on-hover {
-      width: 200px;
-      height: 50px;
-      border: none;
-      outline: none;
+    .frosty-button {
+      padding: 0.75rem 2rem;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
       color: #fff;
-      background: #111;
+      font-weight: 600;
       cursor: pointer;
-      position: relative;
-      border-radius: 10px;
-    }
-    .glow-on-hover:before {
-      content: '';
-      background: linear-gradient(45deg, #0000ff, #7a00ff, #b300ff, #d200ff, #ff00e4, #ff00c8, #ff008c, #ff0050, #0000ff);
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      background-size: 400%;
-      z-index: -1;
-      filter: blur(5px);
-      width: calc(100% + 4px);
-      height: calc(100% + 4px);
-      animation: glowing 20s linear infinite;
-      transition: opacity .3s ease-in-out;
-      border-radius: 10px;
-    }
-    .glow-on-hover:after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: #111;
-      left: 0;
-      top: 0;
-      border-radius: 10px;
-      z-index: -1;
-    }
-    .glow-on-hover:active { color: #000; }
-    .glow-on-hover:active:after { background: transparent; }
-    @keyframes glowing {
-      0% { background-position: 0 0; }
-      50% { background-position: 400% 0; }
-      100% { background-position: 0 0; }
+      transition: all 0.3s ease;
+      backdrop-filter: blur(20px);
     }
 
-    footer {
-      text-align: center;
-      padding: 1rem 0 0.5rem;
-      font-size: 0.85rem;
-      color: #888;
+    .frosty-button:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateY(-2px);
+    }
+
+    section {
+      margin-top: 2.5rem;
     }
 
     section h2 {
-      margin-top: 2rem;
       font-size: 1.5rem;
-      color: #fff;
-    }
-
-    section ul {
-      list-style-type: disc;
-      margin: 0.5rem auto 1rem;
-      text-align: left;
-      padding-left: 2rem;
-      max-width: 400px;
-    }
-
-    section ul li {
+      text-align: center;
       margin-bottom: 0.5rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    ul li::before {
+      content: "\2022";
+      color: #b300ff;
+      font-weight: bold;
+      display: inline-block;
+      width: 1em;
+      margin-left: -1em;
+    }
+
+    footer {
+      margin-top: 2rem;
+      text-align: center;
+      font-size: 0.85rem;
+      color: #aaa;
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="container">
-      <h1>Yasu OS</h1>
-      <p>Bored of the old chromebook interface aswell as features? This operating system that you can run in your browser will soon fix that! Experience peace from spyware and such.</p>
-      <p>By continuing, you agree to our <a href="terms-of-use">Terms of Use</a>.</p>
+  <div class="glass-card">
+    <h1>Yasu OS</h1>
+    <p>Escape the ordinary Chromebook experience with a sleek, browser-based OS. No spyware. Pure performance. Modern aesthetics.</p>
+    <p>By continuing, you agree to our <a href="terms-of-use">Terms of Use</a>.</p>
 
-      <div class="button-group">
-        <form action="bootup">
-          <button type="submit" class="glow-on-hover">Continue</button>
-        </form>
-        <form action="beta-testing">
-          <button type="submit" class="glow-on-hover">Continue to Beta Testing</button>
-        </form>
-      </div>
-
-      <section>
-        <h2>What's New?</h2>
-        <p>The all new vault application.</p>
-      </section>
-
-      <section>
-        <h2>Future Updates</h2>
-        <ul>
-          <li>VRam, VCPU, VGPU, and much more.</li>
-          <li>All new wallpaper app along with a Developer Panel</li>
-          <li>Start Menu Implementation.</li>
-          <li>Yasu</li>
-          <li>A heavy GUI uodate</li>
-          <li>More animations and sound effects</li>
-        </ul>
-      </section>
+    <div class="button-group">
+      <form action="bootup">
+        <button type="submit" class="frosty-button">Continue</button>
+      </form>
+      <form action="beta-testing">
+        <button type="submit" class="frosty-button">Beta Testing</button>
+      </form>
     </div>
+
+    <section>
+      <h2>What's New?</h2>
+      <p>Introducing the Vault App — secure, encrypted, and ultra-minimal.</p>
+    </section>
+
+    <section>
+      <h2>Future Updates</h2>
+      <ul>
+        <li>Virtual RAM, CPU, GPU modules</li>
+        <li>Custom wallpaper app + dev panel</li>
+        <li>Fully integrated Start Menu</li>
+        <li>Yasu Assistant with voice recognition</li>
+        <li>Heavy GUI enhancements</li>
+        <li>Dynamic animations & sound FX</li>
+      </ul>
+    </section>
+
     <footer>
-      <span>Yasu OS &bull; Version 0.0.2-beta</span>
+      Yasu OS &bull; Version 0.0.2-beta
     </footer>
   </div>
 </body>

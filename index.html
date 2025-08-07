@@ -1,41 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MXCEL OS 1</title>
-    <link rel="icon" href="faveicon.png">
-    <script>
-    // Attach a beforeunload event listener that asks for confirmation.
-    window.addEventListener("beforeunload", function (e) {
-      // Standard message (browsers may ignore this custom text).
-      var confirmationMessage = "Are you sure you want to leave this page?";
-      
-      // Some browsers require setting returnValue of the event.
-      e.returnValue = confirmationMessage; 
-      
-      // Return the confirmation message.
-      return confirmationMessage;
-    });
-  </script>
-    
-    <style>
-        /* Ensure the iframe takes up the full screen */
-        html, body {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-        }
+  <meta charset="UTF-8">
+  <title>Loading Yasu OS...</title>
+  <script>
+    window.onload = async () => {
+      // Open a new about:blank window
+      const newWindow = window.open("about:blank", "_blank");
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-        }
-    </style>
+      if (!newWindow) {
+        alert("Popup blocked! Please allow popups for this site.");
+        return;
+      }
+
+      // Fetch your full site content (this file itself or another HTML file)
+      const response = await fetch("startup-page.html");
+      const html = await response.text();
+
+      // Write content into the new window
+      newWindow.document.open();
+      newWindow.document.write(html);
+      newWindow.document.close();
+
+      // Optional: Close the original tab
+      window.close();
+    };
+  </script>
 </head>
 <body>
-    <iframe src="startup-page.html"></iframe>
+  <h1>Loading Yasu OS...</h1>
 </body>
 </html>

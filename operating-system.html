@@ -14,6 +14,24 @@
       font-family: "Segoe UI", sans-serif;
       overflow: hidden;
     }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; display: none; }
+    }
+
     /* Taskbar */
     .taskbar {
       position: fixed;
@@ -21,18 +39,26 @@
       left: 0;
       width: 100%;
       height: 40px;
-      background: rgba(20, 20, 20, 0.8);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       display: flex;
       align-items: center;
       padding: 0 10px;
       box-shadow: 0px -3px 5px rgba(0, 0, 0, 0.5);
+      z-index: 999;
     }
     .taskbar img {
       width: 30px;
       height: 30px;
       cursor: pointer;
       margin-right: 10px;
+      transition: transform 0.2s ease;
     }
+    .taskbar img:hover {
+      transform: scale(1.1);
+    }
+
     /* Desktop Icons */
     .desktop {
       position: absolute;
@@ -42,83 +68,130 @@
       flex-direction: column;
       flex-wrap: wrap;
       gap: 10px;
-      /* Fixed height so that icons wrap to next column when vertical space is used */
-      height: calc(100% - 40px);
+      height: calc(100% - 60px);
+      z-index: 1;
     }
     .icon {
       text-align: center;
       cursor: pointer;
       color: white;
       width: 80px;
+      transition: transform 0.2s ease;
+    }
+    .icon:hover {
+      transform: scale(1.1);
     }
     .icon img {
       width: 50px;
       height: 50px;
     }
+
     /* Windows */
     .window {
       position: absolute;
       width: 800px;
       height: 600px;
-      background: white;
-      border: 2px solid #ccc;
-      box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 2px 2px 20px rgba(0, 0, 0, 0.6);
       display: none;
+      animation: fadeInUp 0.3s ease forwards;
       top: 100px;
       left: 100px;
+      overflow: hidden;
+      border-radius: 10px;
     }
+
+    .window.fadeOut {
+      animation: fadeOut 0.3s ease forwards;
+    }
+
     .window .title-bar {
-      background: #0078D7;
+      background: rgba(0, 120, 215, 0.7);
       color: white;
-      padding: 5px;
+      padding: 5px 10px;
       cursor: move;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      font-weight: bold;
     }
+
     .window .title-bar button {
-      background: red;
+      background: rgba(255, 0, 0, 0.7);
       color: white;
       border: none;
       cursor: pointer;
-      width: 20px;
-      height: 20px;
+      width: 22px;
+      height: 22px;
       font-weight: bold;
-      line-height: 18px;
+      line-height: 20px;
       text-align: center;
       padding: 0;
       margin-left: 5px;
+      border-radius: 4px;
+      transition: background 0.2s ease;
     }
+    .window .title-bar button:hover {
+      background: red;
+    }
+
     .window .content {
-      padding: 10px;
       height: calc(100% - 30px);
-      overflow: auto;
+      padding: 0;
+      overflow: hidden;
     }
+
+    .window iframe,
+    .window .content > div {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
     .resize-handle {
       width: 10px;
       height: 10px;
-      background: gray;
+      background: rgba(150,150,150,0.5);
       position: absolute;
       bottom: 0;
       right: 0;
       cursor: nwse-resize;
     }
+
     /* Custom Context Menu */
     #custom-context-menu {
       position: absolute;
       display: none;
       z-index: 10000;
-      background: #fff;
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid #ccc;
       padding: 5px;
       box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+      border-radius: 5px;
     }
     #custom-context-menu div {
       cursor: pointer;
-      padding: 3px 10px;
+      padding: 4px 12px;
     }
     #custom-context-menu div:hover {
       background: #eee;
+    }
+
+    button {
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #ddd;
+    }
+
+    input {
+      padding: 5px;
+      width: 80%;
+      margin-bottom: 10px;
     }
   </style>
 </head>
@@ -129,17 +202,16 @@
   <div class="taskbar">
     <img src="https://img.icons8.com/ios_filled/512/FA5252/windows-10.png" alt="Start Menu" onclick="alert('Start Menu not implemented yet!')" />
   </div>
-  
+
   <!-- Custom Context Menu -->
   <div id="custom-context-menu">
     <div id="delete-option">Delete</div>
   </div>
 
-  <!-- Include external file that defines appList -->
+  <!-- External app list -->
   <script src="apps.js"></script>
 
   <script>
-    // Load installed states from localStorage.
     function loadInstalledApps() {
       const saved = localStorage.getItem('installedApps');
       if (saved) {
@@ -152,7 +224,6 @@
       }
     }
 
-    // Save installed states to localStorage.
     function saveInstalledApps() {
       const installedApps = {};
       appList.forEach(app => {
@@ -161,16 +232,13 @@
       localStorage.setItem('installedApps', JSON.stringify(installedApps));
     }
 
-    // Render desktop icons only for installed apps.
     function renderDesktopIcons() {
       const desktop = document.querySelector('.desktop');
       desktop.innerHTML = '';
       appList.filter(app => app.installed).forEach(app => {
         const iconDiv = document.createElement('div');
         iconDiv.classList.add('icon');
-        // Double-click to open.
         iconDiv.ondblclick = () => openApp(app.name.toLowerCase());
-        // Right-click for context menu (if app not preinstalled).
         iconDiv.addEventListener('contextmenu', function(e) {
           e.preventDefault();
           if (!app.preinstalled) {
@@ -188,10 +256,8 @@
       });
     }
 
-    // Render taskbar icons only for installed apps.
     function renderTaskbarIcons() {
       const taskbar = document.querySelector('.taskbar');
-      // Remove all children except the first (Start Menu)
       while (taskbar.children.length > 1) {
         taskbar.removeChild(taskbar.lastChild);
       }
@@ -200,9 +266,7 @@
         img.src = app.icon;
         img.alt = app.name;
         img.title = app.name;
-        // Double-click to open.
         img.ondblclick = () => openApp(app.name.toLowerCase());
-        // Right-click for context menu (if app not preinstalled).
         img.addEventListener('contextmenu', function(e) {
           e.preventDefault();
           if (!app.preinstalled) {
@@ -213,65 +277,69 @@
       });
     }
 
-    // Open an app window. If it exists, show it; otherwise, create it.
     function openApp(appId) {
       const app = appList.find(a => a.name.toLowerCase() === appId);
-      if (!app) {
-        console.error("App not found: " + appId);
-        return;
-      }
+      if (!app) return;
+
       let appWindow = document.getElementById(appId);
       if (!appWindow) {
         appWindow = createAppWindow(app);
       } else {
+        appWindow.classList.remove('fadeOut');
         appWindow.style.display = 'block';
-        // If reopening the App Store, refresh its list.
         if (app.name.toLowerCase() === 'app store') {
           renderAppStoreList();
         }
       }
     }
 
-    // Create a Windows 7–styled app window.
     function createAppWindow(app) {
       const windowDiv = document.createElement('div');
       windowDiv.classList.add('window');
       windowDiv.id = app.name.toLowerCase();
       windowDiv.style.display = 'block';
-      // Create the title bar.
+
       const titleBar = document.createElement('div');
       titleBar.classList.add('title-bar');
       titleBar.textContent = app.name;
-      // Create the close button.
+
       const closeButton = document.createElement('button');
       closeButton.textContent = 'X';
-      closeButton.onclick = () => { windowDiv.style.display = 'none'; };
+      closeButton.onclick = () => {
+        windowDiv.classList.add('fadeOut');
+        setTimeout(() => windowDiv.style.display = 'none', 300);
+      };
+
       titleBar.appendChild(closeButton);
-      // Create the content area.
+
       const contentDiv = document.createElement('div');
       contentDiv.classList.add('content');
+
       if (app.name.toLowerCase() === 'settings') {
-        contentDiv.innerHTML = `
+        const settingsHTML = document.createElement('div');
+        settingsHTML.innerHTML = `
           <h3>Change Background</h3>
           <input type="text" id="bg-url" placeholder="Enter image URL (PNG, GIF, etc.)">
           <button onclick="changeBackground()">Apply</button>
         `;
+        contentDiv.appendChild(settingsHTML);
       } else if (app.name.toLowerCase() === 'app store') {
-        contentDiv.innerHTML = `
+        const appStoreDiv = document.createElement('div');
+        appStoreDiv.innerHTML = `
           <h3>App Store</h3>
           <div id="app-store-list"></div>
         `;
+        contentDiv.appendChild(appStoreDiv);
         setTimeout(renderAppStoreList, 0);
       } else {
         const iframe = document.createElement('iframe');
         iframe.src = app.content;
-        iframe.style.width = "100%";
-        iframe.style.height = "100%";
-        iframe.style.border = "none";
         contentDiv.appendChild(iframe);
       }
+
       const resizeHandle = document.createElement('div');
       resizeHandle.classList.add('resize-handle');
+
       windowDiv.appendChild(titleBar);
       windowDiv.appendChild(contentDiv);
       windowDiv.appendChild(resizeHandle);
@@ -280,17 +348,18 @@
       return windowDiv;
     }
 
-    // Make the window draggable and resizable.
     function makeDraggableAndResizable(win) {
       let bar = win.querySelector('.title-bar');
       let resizeHandle = win.querySelector('.resize-handle');
       let isDragging = false, isResizing = false;
       let startX, startY, startWidth, startHeight, offsetX, offsetY;
+
       bar.addEventListener('mousedown', e => {
         isDragging = true;
         offsetX = e.clientX - win.offsetLeft;
         offsetY = e.clientY - win.offsetTop;
       });
+
       resizeHandle.addEventListener('mousedown', e => {
         isResizing = true;
         startX = e.clientX;
@@ -299,6 +368,7 @@
         startHeight = win.offsetHeight;
         e.stopPropagation();
       });
+
       document.addEventListener('mousemove', function(e) {
         if (isDragging) {
           win.style.left = (e.clientX - offsetX) + 'px';
@@ -309,13 +379,13 @@
           win.style.height = startHeight + (e.clientY - startY) + 'px';
         }
       });
+
       document.addEventListener('mouseup', function() {
         isDragging = false;
         isResizing = false;
       });
     }
 
-    // Function to change the background and save it via localStorage.
     function changeBackground() {
       const bgInput = document.getElementById('bg-url');
       if (bgInput && bgInput.value) {
@@ -324,7 +394,6 @@
       }
     }
 
-    // Render the App Store list.
     function renderAppStoreList() {
       const storeList = document.getElementById('app-store-list');
       if (!storeList) return;
@@ -339,33 +408,24 @@
         appDiv.style.border = '1px solid #ccc';
         appDiv.style.padding = '10px';
         appDiv.style.marginBottom = '10px';
-        
-        // Top row with icon and app name.
         const topRow = document.createElement('div');
         topRow.style.display = 'flex';
         topRow.style.alignItems = 'center';
-
         const img = document.createElement('img');
         img.src = app.icon;
         img.style.width = '40px';
         img.style.height = '40px';
         img.style.marginRight = '10px';
-
         const name = document.createElement('span');
         name.textContent = app.name;
         name.style.fontWeight = 'bold';
-
         topRow.appendChild(img);
         topRow.appendChild(name);
-
-        // Description.
         const description = document.createElement('div');
         description.textContent = app.description;
         description.style.fontSize = '12px';
         description.style.color = '#555';
         description.style.marginTop = '5px';
-
-        // Install button.
         const installButton = document.createElement('button');
         installButton.textContent = 'Install';
         installButton.style.marginTop = '10px';
@@ -376,7 +436,6 @@
           renderTaskbarIcons();
           renderAppStoreList();
         };
-
         appDiv.appendChild(topRow);
         appDiv.appendChild(description);
         appDiv.appendChild(installButton);
@@ -384,7 +443,6 @@
       });
     }
 
-    // --- Custom Context Menu Logic ---
     let currentContextApp = null;
     function showContextMenu(x, y, app) {
       currentContextApp = app;
@@ -393,12 +451,13 @@
       menu.style.top = y + 'px';
       menu.style.display = 'block';
     }
+
     function hideContextMenu() {
-      const menu = document.getElementById('custom-context-menu');
-      menu.style.display = 'none';
+      document.getElementById('custom-context-menu').style.display = 'none';
       currentContextApp = null;
     }
-    document.getElementById('delete-option').addEventListener('click', function(e) {
+
+    document.getElementById('delete-option').addEventListener('click', function() {
       if (currentContextApp && !currentContextApp.preinstalled) {
         currentContextApp.installed = false;
         saveInstalledApps();
@@ -408,14 +467,10 @@
       }
       hideContextMenu();
     });
-    document.getElementById('custom-context-menu').addEventListener('click', function(e) {
-      e.stopPropagation();
-    });
-    document.addEventListener('click', function(e) {
-      hideContextMenu();
-    });
 
-    // On page load, load saved installed states, render icons, and restore saved background.
+    document.getElementById('custom-context-menu').addEventListener('click', e => e.stopPropagation());
+    document.addEventListener('click', hideContextMenu);
+
     window.onload = function() {
       loadInstalledApps();
       renderDesktopIcons();

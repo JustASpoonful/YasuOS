@@ -3,10 +3,28 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <link rel="icon" type="image/x-icon" href="Win7Xcel.png">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-  <title>Yasu OS</title>
+  <!-- Coffee Bean Icon for Mocha OS -->
+  <link rel="icon" type="image/x-icon" href="https://img.icons8.com/fluency/96/coffee-beans-.png"> 
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <title>Mocha OS</title>
   <style>
+    :root {
+        /* Catppuccin Mocha Palette */
+        --mocha-base: #1e1e2e;
+        --mocha-mantle: #181825;
+        --mocha-crust: #11111b;
+        --mocha-text: #cdd6f4;
+        --mocha-subtext: #a6adc8;
+        --mocha-overlay: #6c7086;
+        --mocha-surface: #313244;
+        --mocha-blue: #89b4fa;
+        --mocha-purple: #cba6f7;
+        --mocha-pink: #f5c2e7;
+        --mocha-red: #f38ba8;
+        --mocha-green: #a6e3a1;
+        --mocha-yellow: #f9e2af;
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -15,162 +33,298 @@
 
     html, body {
       height: 100%;
-      font-family: 'Inter', sans-serif;
-      background: linear-gradient(120deg, #0f0f0f, #1a1a1a);
+      font-family: 'Fira Sans', sans-serif;
+      background-color: var(--mocha-base);
+      /* Animated Mesh Gradient Background */
+      background-image:
+          radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%),
+          radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%),
+          radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+      background-size: 150% 150%;
+      animation: bgAnimate 20s ease infinite;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
+      color: var(--mocha-text);
+    }
+
+    @keyframes bgAnimate {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    /* Decorative glowing orbs */
+    body::before, body::after {
+      content: '';
+      position: absolute;
+      width: 300px;
+      height: 300px;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+      z-index: 0;
+      animation: floatOrb 10s ease-in-out infinite;
     }
 
     body::before {
-      content: '';
-      position: absolute;
-      width: 600px;
-      height: 600px;
-      background: radial-gradient(circle at center, #7700ff88, transparent);
-      top: -150px;
-      left: -150px;
-      z-index: 0;
-      filter: blur(150px);
-      pointer-events: none;
+      background: var(--mocha-purple);
+      top: 10%;
+      left: 20%;
+      animation-delay: 0s;
+    }
+
+    body::after {
+      background: var(--mocha-blue);
+      bottom: 10%;
+      right: 20%;
+      animation-delay: -5s;
+    }
+
+    @keyframes floatOrb {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(30px, -30px); }
     }
 
     .glass-card {
       position: relative;
-      z-index: 1;
+      z-index: 10;
       width: 90%;
-      max-width: 720px;
-      padding: 3rem 2rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 20px;
-      backdrop-filter: blur(30px);
-      box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
-      color: #f0f0f0;
+      max-width: 800px;
+      padding: 4rem 3rem;
+      background: rgba(30, 30, 46, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 24px;
+      backdrop-filter: blur(40px);
+      -webkit-backdrop-filter: blur(40px);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transform-style: preserve-3d;
+      animation: cardFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes cardFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
     }
 
     h1 {
-      font-size: 3rem;
+      font-size: 4rem;
+      font-weight: 700;
       text-align: center;
-      margin-bottom: 1rem;
-      background: linear-gradient(90deg, #66aaff, #b300ff, #ff007a);
+      margin-bottom: 0.5rem;
+      background: linear-gradient(135deg, var(--mocha-blue), var(--mocha-purple), var(--mocha-pink));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: titlePulse 6s ease-in-out infinite;
+      letter-spacing: -1px;
+      filter: drop-shadow(0 0 15px rgba(203, 166, 247, 0.3));
     }
 
-    @keyframes titlePulse {
-      0% { filter: brightness(1); }
-      50% { filter: brightness(1.5); }
-      100% { filter: brightness(1); }
-    }
-
-    p, ul {
-      font-size: 1.1rem;
+    .subtitle {
+      font-size: 1.2rem;
       line-height: 1.6;
-      margin: 1rem 0;
+      margin-bottom: 2rem;
       text-align: center;
+      color: var(--mocha-subtext);
+      max-width: 600px;
+    }
+
+    .legal-text {
+        font-size: 0.85rem;
+        color: var(--mocha-overlay);
+        margin-bottom: 2rem;
     }
 
     a {
-      color: #66aaff;
+      color: var(--mocha-blue);
       text-decoration: none;
       font-weight: 600;
+      transition: color 0.2s;
+      position: relative;
+    }
+
+    a::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 1px;
+        bottom: -2px;
+        left: 0;
+        background-color: var(--mocha-blue);
+        transform: scaleX(0);
+        transform-origin: bottom right;
+        transition: transform 0.25s ease-out;
+    }
+
+    a:hover::after {
+        transform: scaleX(1);
+        transform-origin: bottom left;
     }
 
     .button-group {
       display: flex;
       justify-content: center;
       gap: 1.5rem;
-      margin: 2rem 0;
+      margin-bottom: 3rem;
       flex-wrap: wrap;
     }
 
     .frosty-button {
-      padding: 0.75rem 2rem;
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.25);
-      border-radius: 12px;
-      color: #fff;
+      padding: 1rem 2.5rem;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      color: var(--mocha-text);
       font-weight: 600;
+      font-size: 1rem;
       cursor: pointer;
-      transition: all 0.3s ease;
-      backdrop-filter: blur(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(10px);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .frosty-button.primary {
+        background: var(--mocha-blue);
+        color: var(--mocha-base);
+        border: none;
+        box-shadow: 0 0 20px rgba(137, 180, 250, 0.4);
     }
 
     .frosty-button:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateY(-2px);
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
     }
 
-    section {
-      margin-top: 2.5rem;
+    .frosty-button.primary:hover {
+        background: #b4befe; /* lighter blue */
+        box-shadow: 0 0 30px rgba(137, 180, 250, 0.6);
     }
 
-    section h2 {
-      font-size: 1.5rem;
-      text-align: center;
-      margin-bottom: 0.5rem;
+    .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .info-card {
+        background: rgba(255, 255, 255, 0.03);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        padding: 1.5rem;
+        transition: 0.3s;
+    }
+
+    .info-card:hover {
+        background: rgba(255, 255, 255, 0.06);
+        transform: translateY(-2px);
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      text-align: left;
+      margin-bottom: 1rem;
+      color: var(--mocha-pink);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     ul {
       list-style: none;
       padding: 0;
+      text-align: left;
     }
 
-    ul li::before {
-      content: "\2022";
-      color: #b300ff;
-      font-weight: bold;
-      display: inline-block;
-      width: 1em;
-      margin-left: -1em;
+    ul li {
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--mocha-subtext);
+        font-size: 0.95rem;
+    }
+
+    ul li i {
+        color: var(--mocha-green);
+        font-size: 0.8rem;
     }
 
     footer {
-      margin-top: 2rem;
+      margin-top: 3rem;
       text-align: center;
       font-size: 0.85rem;
-      color: #aaa;
+      color: var(--mocha-overlay);
+      border-top: 1px solid rgba(255,255,255,0.05);
+      padding-top: 1.5rem;
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+        h1 { font-size: 2.5rem; }
+        .grid-container { grid-template-columns: 1fr; }
+        .glass-card { padding: 2rem; }
     }
   </style>
+  <!-- FontAwesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <div class="glass-card">
-    <h1>Yasu OS</h1>
-    <p>Escape the ordinary Chromebook experience with a sleek, browser-based OS. No spyware. Pure performance. Modern aesthetics.</p>
-    <p>By continuing, you agree to our <a href="terms-of-use">Terms of Use</a>.</p>
+    <h1>Mocha OS</h1>
+    <p class="subtitle">A web-based operating system crafted for the aesthetic power user. Dark, minimal, and fueled by caffeine.</p>
+    
+    <p class="legal-text">By initializing boot sequence, you acknowledge the <a href="#">Terms of Service</a>.</p>
 
     <div class="button-group">
-      <form action="bootup">
-        <button type="submit" class="frosty-button">Continue</button>
+      <!-- Primary Action -->
+      <form action="mocha_os.html"> 
+        <button type="submit" class="frosty-button primary">
+            <i class="fa-solid fa-power-off" style="margin-right:8px;"></i> Initialize System
+        </button>
       </form>
-      <form action="beta-testing">
-        <button type="submit" class="frosty-button">Beta Testing</button>
+      <!-- Secondary Action -->
+      <form action="#">
+        <button type="button" class="frosty-button" onclick="alert('Beta access is currently full. Check back later!')">
+            <i class="fa-solid fa-flask" style="margin-right:8px;"></i> Join Beta
+        </button>
       </form>
     </div>
 
-    <section>
-      <h2>What's New?</h2>
-      <p>Introducing the Vault App — secure, encrypted, and ultra-minimal.</p>
-    </section>
+    <div class="grid-container">
+        <!-- News Section -->
+        <div class="info-card">
+            <h2><i class="fa-solid fa-bolt"></i> Latest Release</h2>
+            <p style="text-align: left; color: var(--mocha-text); font-size: 0.95rem;">
+                <strong>v1.2 "Espresso"</strong> is now live.
+            </p>
+            <p style="text-align: left; margin-top: 0.5rem; font-size: 0.9rem; color: var(--mocha-subtext);">
+                Featuring the new Vault App with AES-256 simulation and a completely rewritten window manager.
+            </p>
+        </div>
 
-    <section>
-      <h2>Future Updates</h2>
-      <ul>
-        <li>Virtual RAM, CPU, GPU modules</li>
-        <li>Custom wallpaper app + dev panel</li>
-        <li>Fully integrated Start Menu</li>
-        <li>Yasu Assistant with voice recognition</li>
-        <li>Heavy GUI enhancements</li>
-        <li>Dynamic animations & sound FX</li>
-      </ul>
-    </section>
+        <!-- Roadmap Section -->
+        <div class="info-card">
+            <h2><i class="fa-solid fa-map"></i> Roadmap</h2>
+            <ul>
+                <li><i class="fa-solid fa-check"></i> Persistent Storage</li>
+                <li><i class="fa-solid fa-check"></i> Dynamic Themes</li>
+                <li><i class="fa-regular fa-circle"></i> <strong>Virtual Kernel Modules</strong></li>
+                <li><i class="fa-regular fa-circle"></i> AI Assistant Integration</li>
+                <li><i class="fa-regular fa-circle"></i> WebAssembly Support</li>
+            </ul>
+        </div>
+    </div>
 
     <footer>
-      Yasu OS &bull; Version 0.0.2-beta
+      Mocha OS &bull; Stable Build v1.2 &bull; Designed with <i class="fa-solid fa-heart" style="color: var(--mocha-red);"></i> & <i class="fa-solid fa-mug-hot" style="color: var(--mocha-yellow);"></i>
     </footer>
   </div>
 </body>
